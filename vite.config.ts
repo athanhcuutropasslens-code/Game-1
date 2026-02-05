@@ -5,10 +5,9 @@ import fs from "node:fs";
 import path from "path";
 import { defineConfig } from "vite";
 import { vitePluginManusRuntime } from "vite-plugin-manus-runtime";
-
 const plugins = [react(), tailwindcss(), jsxLocPlugin(), vitePluginManusRuntime()];
-
 export default defineConfig({
+  base: './',
   plugins,
   resolve: {
     alias: {
@@ -25,7 +24,7 @@ export default defineConfig({
   },
   server: {
     port: 3000,
-    strictPort: false, // Will find next available port if 3000 is busy
+    strictPort: false,
     host: true,
     allowedHosts: [
       ".manuspre.computer",
