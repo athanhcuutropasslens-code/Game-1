@@ -7,7 +7,7 @@ import { defineConfig } from "vite";
 import { vitePluginManusRuntime } from "vite-plugin-manus-runtime";
 const plugins = [react(), tailwindcss(), jsxLocPlugin(), vitePluginManusRuntime()];
 export default defineConfig({
-  base: './',
+  base: '/Game-1/',
   plugins,
   resolve: {
     alias: {
