@@ -572,7 +572,11 @@ function Game() {
   const { final: currentRealStats } = useMemo(() => computeFullStats(player), [player]);
 
   const addLog = useCallback((msg, color = 'text-slate-300') => {
-    setLogs(prev => [{ id: Date.now() + Math.random(), msg, color }, ...prev].slice(0, 5));
+    const id = Date.now() + Math.random();
+    setLogs(prev => [{ id, msg, color }, ...prev].slice(0, 5));
+    setTimeout(() => {
+      setLogs(prev => prev.filter(log => log.id !== id));
+    }, 3000);
   }, []);
 
   const addEffect = useCallback((text, type = 'damage', x = 50, y = 50) => {
@@ -652,6 +656,17 @@ function Game() {
     setGameState(GAME_STATE.MAP);
     addLog(`Tầng ${f} - ${ZONES_DB.find(z => z.id === zId)?.name}`);
   }, [addLog]);
+
+  const closeShop = useCallback(() => {
+    setActiveModal(MODAL_STATE.NONE);
+    // Mark shop room as completed and unlock next
+    setMapRooms(prev => prev.map(room => 
+      room.id === currentRoomId 
+        ? { ...room, completed: true } 
+        : (room.id === currentRoomId + 1 ? { ...room, locked: false } : room)
+    ));
+    addLog("Đã rời cửa hàng.");
+  }, [currentRoomId]);
 
   const enterRoom = useCallback((r) => {
     if (r.locked || r.completed) return;
@@ -1603,7 +1618,7 @@ function Game() {
                 <div className="font-bold text-yellow-500 flex items-center gap-2">
                   <Store size={18}/> Cửa Hàng
                 </div>
-                <button onClick={() => setActiveModal(MODAL_STATE.NONE)}>
+                <button onClick={closeShop}>
                   <X/>
                 </button>
               </div>
