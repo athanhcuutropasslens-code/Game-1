@@ -5,6 +5,7 @@ import {
   ShoppingBag, ArrowRight, Backpack, Activity, User, X, 
   Store, Hammer, Zap, Shirt, Sparkles, Gift, Lock, Minus, Plus, ChevronRight, ChevronLeft, Flame, Droplets, Snowflake, Hourglass, Star, Scroll, Cross, Book, Crown, Wand, Package, Syringe, Search, Info
 } from 'lucide-react';
+import PixelZoneBackground from './PixelZoneBackground';
 
 // --- CONFIGURATION ---
 const ITEMS_PER_PAGE = 20;
@@ -98,10 +99,82 @@ const CLASSES_DB = {
 };
 
 const ZONES_DB = [
-  { id: 'z_forest', name: 'Rừng Độc', difficulty: 0, desc: 'Quái vật gây Độc.', color: 'text-green-400', bg: 'from-green-900 to-slate-900' },
-  { id: 'z_ruins', name: 'Tàn Tích', difficulty: 2, desc: 'Quái vật gây Choáng.', color: 'text-yellow-400', bg: 'from-yellow-900 to-slate-900' },
-  { id: 'z_dungeon', name: 'Hầm Ngục', difficulty: 5, desc: 'Quái vật gây Suy Yếu.', color: 'text-purple-400', bg: 'from-purple-900 to-slate-900' },
-  { id: 'z_hell', name: 'Địa Ngục', difficulty: 10, desc: 'Thử thách cực đại.', color: 'text-red-500', bg: 'from-red-900 to-orange-900' },
+  {
+    id: 'z_forest',
+    name: 'Rừng Độc',
+    difficulty: 0,
+    desc: 'Quái vật gây Độc.',
+    color: 'text-green-400',
+    bg: 'from-green-900 to-slate-900',
+    zoneVisual: {
+      farTile: 'radial-gradient(circle at 20% 20%, rgba(34,197,94,0.25) 0 14%, transparent 14%), radial-gradient(circle at 80% 70%, rgba(22,163,74,0.20) 0 10%, transparent 10%)',
+      midTile: 'repeating-linear-gradient(45deg, rgba(20,83,45,0.35) 0 8px, rgba(15,23,42,0.35) 8px 16px)',
+      nearTile: 'repeating-linear-gradient(90deg, rgba(22,101,52,0.38) 0 6px, rgba(20,83,45,0.38) 6px 12px)',
+      overlay: 'linear-gradient(to bottom, rgba(2,6,23,0.22), rgba(2,6,23,0.35))',
+      fogColor: '34,197,94',
+      fogOpacity: 0.08,
+      lightColor: '163,230,53',
+      lightOpacity: 0.06,
+      darkOverlay: 0.26,
+    },
+  },
+  {
+    id: 'z_ruins',
+    name: 'Tàn Tích',
+    difficulty: 2,
+    desc: 'Quái vật gây Choáng.',
+    color: 'text-yellow-400',
+    bg: 'from-yellow-900 to-slate-900',
+    zoneVisual: {
+      farTile: 'repeating-linear-gradient(0deg, rgba(120,113,108,0.24) 0 18px, rgba(68,64,60,0.24) 18px 36px)',
+      midTile: 'repeating-linear-gradient(90deg, rgba(161,98,7,0.26) 0 10px, rgba(120,53,15,0.26) 10px 20px)',
+      nearTile: 'repeating-linear-gradient(45deg, rgba(113,63,18,0.30) 0 8px, rgba(68,64,60,0.30) 8px 16px)',
+      overlay: 'linear-gradient(to bottom, rgba(28,25,23,0.20), rgba(2,6,23,0.34))',
+      fogColor: '245,158,11',
+      fogOpacity: 0.07,
+      lightColor: '254,240,138',
+      lightOpacity: 0.05,
+      darkOverlay: 0.24,
+    },
+  },
+  {
+    id: 'z_dungeon',
+    name: 'Hầm Ngục',
+    difficulty: 5,
+    desc: 'Quái vật gây Suy Yếu.',
+    color: 'text-purple-400',
+    bg: 'from-purple-900 to-slate-900',
+    zoneVisual: {
+      farTile: 'repeating-linear-gradient(90deg, rgba(88,28,135,0.22) 0 14px, rgba(30,27,75,0.22) 14px 28px)',
+      midTile: 'repeating-linear-gradient(0deg, rgba(76,29,149,0.30) 0 9px, rgba(51,65,85,0.30) 9px 18px)',
+      nearTile: 'repeating-linear-gradient(45deg, rgba(91,33,182,0.34) 0 7px, rgba(30,41,59,0.34) 7px 14px)',
+      overlay: 'linear-gradient(to bottom, rgba(15,23,42,0.20), rgba(2,6,23,0.35))',
+      fogColor: '168,85,247',
+      fogOpacity: 0.09,
+      lightColor: '196,181,253',
+      lightOpacity: 0.05,
+      darkOverlay: 0.3,
+    },
+  },
+  {
+    id: 'z_hell',
+    name: 'Địa Ngục',
+    difficulty: 10,
+    desc: 'Thử thách cực đại.',
+    color: 'text-red-500',
+    bg: 'from-red-900 to-orange-900',
+    zoneVisual: {
+      farTile: 'radial-gradient(circle at 30% 30%, rgba(239,68,68,0.24) 0 12%, transparent 12%), radial-gradient(circle at 70% 65%, rgba(251,146,60,0.22) 0 10%, transparent 10%)',
+      midTile: 'repeating-linear-gradient(0deg, rgba(153,27,27,0.34) 0 10px, rgba(124,45,18,0.34) 10px 20px)',
+      nearTile: 'repeating-linear-gradient(90deg, rgba(185,28,28,0.40) 0 8px, rgba(154,52,18,0.40) 8px 16px)',
+      overlay: 'linear-gradient(to bottom, rgba(69,10,10,0.20), rgba(2,6,23,0.35))',
+      fogColor: '248,113,113',
+      fogOpacity: 0.08,
+      lightColor: '253,186,116',
+      lightOpacity: 0.07,
+      darkOverlay: 0.32,
+    },
+  },
 ];
 
 const EFFECTS_DB = {
@@ -999,7 +1072,7 @@ function Game() {
   // --- MAIN RENDER ---
   return (
     <div className="min-h-screen bg-slate-950 text-white font-mono select-none flex items-center justify-center p-2">
-      <div className={`w-full max-w-[400px] h-[800px] bg-gradient-to-b ${zone.bg} border-4 border-slate-700 rounded-2xl overflow-hidden shadow-2xl relative flex flex-col`}>
+      <div className="w-full max-w-[400px] h-[800px] bg-slate-950 border-4 border-slate-700 rounded-2xl overflow-hidden shadow-2xl relative flex flex-col">
         {/* HEADER */}
         <div className="h-14 bg-slate-900/90 backdrop-blur border-b-4 border-slate-700 flex items-center justify-between px-3 z-20 shrink-0">
           <div className="flex flex-col">
@@ -1040,6 +1113,13 @@ function Game() {
 
         {/* MAIN CONTENT */}
         <div className="flex-1 relative overflow-hidden flex flex-col">
+          {(gameState === GAME_STATE.MAP || gameState === GAME_STATE.COMBAT) && (
+            <PixelZoneBackground
+              zoneVisual={zone.zoneVisual}
+              isCombat={gameState === GAME_STATE.COMBAT}
+            />
+          )}
+
           {/* EFFECTS OVERLAY */}
           {effects.map(e => (
             <div 
