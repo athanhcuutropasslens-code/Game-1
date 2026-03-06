@@ -170,6 +170,19 @@ const ITEMS_DB = [
 
 const MONSTER_PREFIXES = ["Hư Không", "Bóng Tối", "Rực Lửa", "Băng Giá", "Độc Dược", "Cuồng Nộ", "Cổ Đại"];
 const MONSTER_TYPES = ["Slime", "Goblin", "Bộ Xương", "Dơi", "Sói", "Orc", "Phù Thủy", "Golem", "Rồng"];
+const SPRITE_MODE = 'sheet';
+const CLASS_SPRITE_IDS = ['warrior', 'rogue', 'mage', 'cleric'];
+const MONSTER_TYPE_MAP = {
+  slime: 'slime',
+  goblin: 'goblin',
+  'bộ xương': 'skeleton',
+  dơi: 'bat',
+  sói: 'wolf',
+  orc: 'orc',
+  'phù thủy': 'witch',
+  golem: 'golem',
+  rồng: 'dragon',
+};
 
 // --- LOGIC FUNCTIONS ---
 const calculateCost = (item) => {
@@ -384,6 +397,7 @@ const generateShop = (floor, playerClass) => {
 const generateMonster = (floor, roomType) => {
   const prefix = MONSTER_PREFIXES[Math.floor(Math.random() * MONSTER_PREFIXES.length)];
   const type = MONSTER_TYPES[Math.floor(Math.random() * MONSTER_TYPES.length)];
+  const normalizedType = MONSTER_TYPE_MAP[type.toLowerCase()] || 'slime';
   const name = `${prefix} ${type}`;
   const isElite = roomType === 'ELITE';
   const isBoss = roomType === 'BOSS';
@@ -408,7 +422,9 @@ const generateMonster = (floor, roomType) => {
     atk: baseAtk,
     diceSides: 6,
     seed: Math.random() * 1000,
-    type: isBoss ? 'boss' : 'monster',
+    type: normalizedType,
+    tier: isBoss ? 'boss' : (isElite ? 'elite' : 'normal'),
+    entityType: isBoss ? 'boss' : 'monster',
     roomType
   };
 };
@@ -471,6 +487,135 @@ const PixelAvatar = ({ seed, size = 100, type = 'hero', isDead = false }) => {
   }, [seed, type, isDead]);
   
   return <canvas ref={canvasRef} width={120} height={120} style={{ width: size, height: size, imageRendering: 'pixelated' }} className="drop-shadow-lg" />;
+};
+
+
+
+const SpriteSheetAvatar = ({
+  size = 100,
+  variant,
+  id,
+  tier = 'normal',
+  isDead = false,
+  isHit = false,
+}) => {
+  const canvasRef = useRef(null);
+
+  useEffect(() => {
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+    const ctx = canvas.getContext('2d');
+    if (!ctx) return;
+
+    const frameSize = 16;
+    const frameCount = 3;
+    const activeFrame = isDead ? 2 : (Math.floor(Date.now() / 150) % frameCount);
+
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    ctx.imageSmoothingEnabled = false;
+
+    const drawPx = (x, y, color) => {
+      ctx.fillStyle = color;
+      const offset = activeFrame * 0.25;
+      ctx.fillRect((x + offset) * (canvas.width / frameSize), y * (canvas.height / frameSize), canvas.width / frameSize, canvas.height / frameSize);
+    };
+
+    const heroPalette = {
+      warrior: { body: '#94a3b8', accent: '#f59e0b', weapon: '#dc2626', shadow: '#1f2937' },
+      rogue: { body: '#16a34a', accent: '#84cc16', weapon: '#f1f5f9', shadow: '#14532d' },
+      mage: { body: '#9333ea', accent: '#38bdf8', weapon: '#f8fafc', shadow: '#312e81' },
+      cleric: { body: '#e2e8f0', accent: '#facc15', weapon: '#60a5fa', shadow: '#334155' },
+    };
+
+    const monsterPalette = {
+      slime: ['#34d399', '#059669', '#a7f3d0'],
+      goblin: ['#84cc16', '#3f6212', '#facc15'],
+      skeleton: ['#f8fafc', '#9ca3af', '#1f2937'],
+      bat: ['#a78bfa', '#6d28d9', '#f472b6'],
+      wolf: ['#9ca3af', '#374151', '#ef4444'],
+      orc: ['#65a30d', '#365314', '#b45309'],
+      witch: ['#7c3aed', '#1d4ed8', '#ec4899'],
+      golem: ['#6b7280', '#374151', '#f97316'],
+      dragon: ['#ef4444', '#7f1d1d', '#f59e0b'],
+    };
+
+    const tierGlow = {
+      normal: '#ffffff',
+      elite: '#fde047',
+      boss: '#c084fc',
+    };
+
+    if (variant === 'hero') {
+      const pal = heroPalette[id] || heroPalette.warrior;
+      const weaponPose = {
+        warrior: [[11, 6], [12, 5], [13, 4]],
+        rogue: [[11, 8], [12, 9]],
+        mage: [[11, 3], [12, 2], [12, 1]],
+        cleric: [[11, 6], [12, 6], [12, 7], [12, 8]],
+      };
+
+      for (let y = 4; y <= 9; y++) {
+        for (let x = 6; x <= 9; x++) drawPx(x, y, pal.body);
+      }
+      drawPx(7, 3, pal.accent);
+      drawPx(8, 3, pal.accent);
+      drawPx(6, 6, pal.accent);
+      drawPx(9, 6, pal.accent);
+      drawPx(6, 10 + (activeFrame === 1 ? 1 : 0), pal.shadow);
+      drawPx(9, 10 + (activeFrame === 2 ? 1 : 0), pal.shadow);
+      (weaponPose[id] || weaponPose.warrior).forEach(([x, y]) => drawPx(x, y, pal.weapon));
+    } else {
+      const pal = monsterPalette[id] || monsterPalette.slime;
+      const shape = {
+        slime: [[6, 11], [7, 11], [8, 11], [5, 10], [9, 10], [5, 9], [6, 9], [7, 9], [8, 9], [9, 9], [6, 8], [8, 8]],
+        goblin: [[6, 3], [7, 3], [8, 3], [5, 4], [9, 4], [6, 5], [8, 5], [6, 7], [8, 7], [5, 9], [9, 9]],
+        skeleton: [[6, 3], [8, 3], [6, 4], [7, 4], [8, 4], [6, 6], [8, 6], [5, 8], [9, 8], [5, 10], [9, 10]],
+        bat: [[5, 6], [6, 5], [7, 6], [8, 5], [9, 6], [6, 7], [8, 7], [7, 8]],
+        wolf: [[5, 6], [6, 5], [7, 5], [8, 5], [9, 6], [6, 7], [8, 7], [5, 9], [9, 9]],
+        orc: [[6, 3], [7, 3], [8, 3], [5, 5], [9, 5], [5, 7], [9, 7], [6, 9], [8, 9], [5, 11], [9, 11]],
+        witch: [[6, 2], [7, 2], [8, 2], [6, 4], [8, 4], [6, 6], [8, 6], [5, 8], [9, 8], [7, 10], [11, 4]],
+        golem: [[5, 3], [6, 3], [7, 3], [8, 3], [9, 3], [5, 5], [9, 5], [5, 7], [9, 7], [5, 9], [9, 9]],
+        dragon: [[5, 3], [6, 2], [7, 3], [8, 2], [9, 3], [6, 5], [8, 5], [5, 7], [9, 7], [6, 9], [8, 9], [10, 4]],
+      };
+
+      (shape[id] || shape.slime).forEach(([x, y], idx) => drawPx(x, y + (activeFrame === 1 ? -1 : 0), pal[idx % pal.length]));
+      drawPx(6, 6, '#111827');
+      drawPx(8, 6, '#111827');
+      if (tier !== 'normal') {
+        drawPx(7, 1, tierGlow[tier] || tierGlow.normal);
+        drawPx(6, 2, tierGlow[tier] || tierGlow.normal);
+        drawPx(8, 2, tierGlow[tier] || tierGlow.normal);
+      }
+    }
+  }, [variant, id, tier, isDead]);
+
+  return (
+    <canvas
+      ref={canvasRef}
+      width={128}
+      height={128}
+      style={{ width: size, height: size, imageRendering: 'pixelated' }}
+      className={`drop-shadow-lg transition-all duration-200 ${isHit ? 'animate-pulse brightness-150 saturate-150' : ''} ${isDead ? 'grayscale opacity-60' : ''}`}
+    />
+  );
+};
+
+const CombatAvatar = ({ size, seed, role, classId, monsterType, roomType, isDead, isHit }) => {
+  const tier = roomType === 'BOSS' ? 'boss' : roomType === 'ELITE' ? 'elite' : 'normal';
+  const useSheet = SPRITE_MODE === 'sheet' && (
+    (role === 'hero' && CLASS_SPRITE_IDS.includes(classId)) ||
+    (role === 'monster' && !!monsterType)
+  );
+
+  if (!useSheet) {
+    return <PixelAvatar seed={seed} size={size} type={role === 'hero' ? 'hero' : roomType === 'BOSS' ? 'boss' : 'monster'} isDead={isDead} />;
+  }
+
+  if (role === 'hero') {
+    return <SpriteSheetAvatar size={size} variant="hero" id={classId} isDead={isDead} isHit={isHit} />;
+  }
+
+  return <SpriteSheetAvatar size={size} variant="monster" id={monsterType} tier={tier} isDead={isDead} isHit={isHit} />;
 };
 
 const StatAllocationRowDetailed = ({ label, code, val, tempVal, breakdownKey, icon, player, statBreakdown, expandedStat, setExpandedStat }) => {
@@ -565,6 +710,7 @@ function Game() {
   
   const [monster, setMonster] = useState(null);
   const [animState, setAnimState] = useState({ p: '', m: '' });
+  const [hitState, setHitState] = useState({ p: false, m: false });
   const [diceResult, setDiceResult] = useState(null);
   const [selectedItem, setSelectedItem] = useState(null);
 
@@ -700,10 +846,16 @@ function Game() {
     // Update monster HP
     const newMonsterHp = monster.hp - pDmg;
     setMonster(m => ({ ...m, hp: newMonsterHp }));
+    setHitState(h => ({ ...h, m: true }));
+    setTimeout(() => setHitState(h => ({ ...h, m: false })), 160);
     
     // Update player HP
     const newPlayerHp = player.hp - mDmg;
     setPlayer(p => ({ ...p, hp: newPlayerHp }));
+    if (mDmg > 0) {
+      setHitState(h => ({ ...h, p: true }));
+      setTimeout(() => setHitState(h => ({ ...h, p: false })), 160);
+    }
     
     addLog(`Đánh ${pDmg}, nhận ${mDmg} ST.`);
     addEffect(`-${pDmg}`, 'damage', 30, 30);
@@ -1154,10 +1306,14 @@ function Game() {
                   onClick={() => setActiveModal(MODAL_STATE.MONSTER_INFO)} 
                   className="relative cursor-pointer group"
                 >
-                  <PixelAvatar 
+                  <CombatAvatar 
                     seed={monster.seed} 
                     size={120} 
-                    type={monster.type} 
+                    role="monster"
+                    classId={player.classId}
+                    monsterType={monster.type}
+                    roomType={monster.roomType}
+                    isHit={hitState.m}
                     isDead={monster.hp <= 0} 
                   />
                   <div className="absolute top-0 right-0 bg-slate-900 rounded-full p-1 border border-slate-500 opacity-0 group-hover:opacity-100 transition-opacity">
@@ -1192,10 +1348,14 @@ function Game() {
                     HP: {Math.max(0, player.hp)} / {stats.maxHp}
                   </span>
                 </div>
-                <PixelAvatar 
+                <CombatAvatar 
                   seed={player.seed} 
                   size={80} 
-                  type="hero" 
+                  role="hero"
+                  classId={player.classId}
+                  monsterType={monster?.type}
+                  roomType={monster?.roomType}
+                  isHit={hitState.p}
                   isDead={player.hp <= 0}
                 />
                 <div className="text-xs text-slate-400 mt-1">
@@ -1415,7 +1575,7 @@ function Game() {
               >
                 <h2 className="text-2xl font-black text-red-500 mb-2">{monster.name}</h2>
                 <div className="flex justify-center mb-4">
-                  <PixelAvatar seed={monster.seed} size={100} type={monster.type} />
+                  <CombatAvatar seed={monster.seed} size={100} role="monster" classId={player.classId} monsterType={monster.type} roomType={monster.roomType} isDead={monster.hp <= 0} isHit={false} />
                 </div>
                 <div className="grid grid-cols-2 gap-4 text-left mb-4">
                   <div className="bg-slate-900 p-2 rounded border border-slate-700">
