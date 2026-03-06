@@ -5,6 +5,7 @@ import {
   ShoppingBag, ArrowRight, Backpack, Activity, User, X, 
   Store, Hammer, Zap, Shirt, Sparkles, Gift, Lock, Minus, Plus, ChevronRight, ChevronLeft, Flame, Droplets, Snowflake, Hourglass, Star, Scroll, Cross, Book, Crown, Wand, Package, Syringe, Search, Info
 } from 'lucide-react';
+import PixelItemIcon from '@/components/PixelItemIcon';
 
 // --- CONFIGURATION ---
 const ITEMS_PER_PAGE = 20;
@@ -978,7 +979,7 @@ function Game() {
           </div>
         )}
         <div className="flex items-center justify-center h-full text-2xl drop-shadow-md">
-          {renderIcon(item.icon, 24)}
+          <PixelItemIcon id={item.id} fallbackIcon={item.icon} size={24} />
         </div>
         {item.affixes?.length > 0 && (
           <div className="absolute top-0 left-0 text-yellow-400 text-[8px] p-0.5">
@@ -1467,7 +1468,7 @@ function Game() {
                             onClick={() => setSelectedItem({...player.equipment[slot], isEquipped: true, slot})}
                             className={`aspect-square border-2 rounded p-1 cursor-pointer bg-slate-800 ${RARITY_CONFIG[player.equipment[slot].rarity].color}`}
                           >
-                            {renderIcon(player.equipment[slot].icon, 24)}
+                            <PixelItemIcon id={player.equipment[slot].id} fallbackIcon={player.equipment[slot].icon} size={24} />
                           </div>
                         ) : (
                           <div className="aspect-square bg-slate-900 border border-slate-800 rounded opacity-50 flex items-center justify-center">
@@ -1509,7 +1510,7 @@ function Game() {
                       onClick={() => setSelectedItem(i)}
                       className={`aspect-square border-2 rounded p-1 cursor-pointer bg-slate-800 hover:brightness-125 ${RARITY_CONFIG[i.rarity].color}`}
                     >
-                      {renderIcon(i.icon, 24)}
+                      <PixelItemIcon id={i.id} fallbackIcon={i.icon} size={24} />
                       {i.level > 1 && (
                         <div className="absolute top-0 right-0 bg-black/60 text-white text-[8px] px-1 rounded-bl">
                           +{i.level}
@@ -1632,7 +1633,7 @@ function Game() {
                     }`}
                   >
                     <div className="text-2xl">
-                      {renderIcon(item.icon, 24)}
+                      <PixelItemIcon id={item.id} fallbackIcon={item.icon} size={24} />
                     </div>
                     <div className="flex-1">
                       <div className="font-bold text-sm">

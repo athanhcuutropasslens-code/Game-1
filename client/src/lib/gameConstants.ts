@@ -347,6 +347,29 @@ export const MONSTER_TYPES = [
   'Rồng',
 ];
 
+
+
+export const ITEM_PIXEL_ICON_MAP = {
+  pot_small: { atlas: 'consumable', tile: 0 },
+  pot_large: { atlas: 'consumable', tile: 1 },
+  scroll_shield: { atlas: 'consumable', tile: 2 },
+  pot_str: { atlas: 'effect', tile: 0 },
+  respec: { atlas: 'effect', tile: 2 },
+  w_sword: { atlas: 'weapon', tile: 0 },
+  w_axe: { atlas: 'weapon', tile: 1 },
+  w_dagger: { atlas: 'weapon', tile: 0 },
+  w_staff: { atlas: 'weapon', tile: 2 },
+  a_plate: { atlas: 'armor', tile: 0 },
+  a_robe: { atlas: 'armor', tile: 2 },
+  a_leather: { atlas: 'armor', tile: 1 },
+  ac_ring: { atlas: 'accessory', tile: 0 },
+} as const;
+
+export const EFFECT_PIXEL_ICON_MAP = {
+  eff_strong: { atlas: 'effect', tile: 0 },
+  eff_shield: { atlas: 'effect', tile: 1 },
+  eff_burn: { atlas: 'effect', tile: 2 },
+} as const;
 export const ITEMS_DB: any[] = [
   {
     id: 'pot_small',
