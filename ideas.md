@@ -146,3 +146,36 @@
 **Đã chọn: Retro Arcade Cyberpunk**
 
 Lý do: Phù hợp với tên "Pixel Rogue" và tạo cảm giác game retro thú vị, năng lượng cao, thu hút người chơi. Neon colors và pixelated aesthetic sẽ làm game nổi bật và dễ nhớ.
+
+---
+
+## Ghi chú xử lý thông báo conflict cho các hạng mục 2, 4, 5, 6
+
+Nếu PR hiển thị cảnh báo: `This branch has conflicts that must be resolved`, xử lý theo checklist sau để giảm rủi ro mất ý tưởng UI pixel art đã chốt:
+
+1. **Ưu tiên giữ phần thiết kế nhận diện Consumable (mục 2)**
+   - Giữ icon riêng cho `Thuốc Sức Mạnh` (dáng lọ thuốc + aura), **không** merge ngược về icon dạng kiếm.
+   - Đảm bảo mapping icon của Consumable và Weapon không trùng silhouette chính.
+
+2. **Ưu tiên giữ cấu trúc Background theo zone (mục 4)**
+   - Giữ metadata nền theo zone (tile/layer/overlay) thay vì quay lại gradient chung một kiểu.
+   - Nếu conflict ở component nền, ưu tiên nhánh có hỗ trợ parallax + overlay đọc chữ tốt.
+
+3. **Ưu tiên giữ pixel UI cho inventory/shop/equipment (mục 5)**
+   - Giữ frame theo type item (Consumable/Weapon/Armor/Accessory).
+   - Nếu xung đột className, chọn phiên bản còn badge type + hierarchy thông tin rõ.
+
+4. **Ưu tiên giữ bộ design token pixel-128 (mục 6)**
+   - Không hardcode màu rời rạc nếu đã có token/palette tập trung.
+   - Khi conflict giữa token mới và mã cũ, ưu tiên token mới để đồng bộ toàn game.
+
+5. **Quy trình resolve khuyến nghị (CLI)**
+   - `git fetch origin`
+   - `git merge origin/main` *(hoặc base branch thực tế)*
+   - Resolve từng file theo thứ tự: `consumable/icon` → `background` → `inventory UI` → `theme token`.
+   - Chạy kiểm tra build/test, sau đó commit merge với message rõ phạm vi resolve.
+
+6. **Tiêu chí nghiệm thu sau resolve conflict**
+   - Người chơi nhìn nhanh có thể phân biệt ngay: Thuốc Sức Mạnh ≠ Kiếm.
+   - UI giữa Shop, Inventory, Equipment dùng cùng ngôn ngữ pixel art.
+   - Background theo zone vẫn đúng bối cảnh và không làm giảm readability của HUD/text.
