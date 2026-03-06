@@ -77,7 +77,12 @@
   --sidebar-accent-foreground: oklch(0.08 0.01 240);
   --sidebar-border: oklch(0.25 0.02 280);
   --sidebar-ring: oklch(0.95 0.05 120);
+
+  --pixel-bg-main: #0a0e27;
+  --pixel-border-color: #00ff41;
+  --pixel-glow-shadow: 0 0 10px currentColor, 0 0 20px currentColor;
 }
+
 
 .dark {
   /* Retro Arcade Cyberpunk - Dark Mode (Always Active) */
@@ -113,7 +118,12 @@
   --sidebar-accent-foreground: oklch(0.08 0.01 240);
   --sidebar-border: oklch(0.25 0.02 280);
   --sidebar-ring: oklch(0.95 0.05 120);
+
+  --pixel-bg-main: #0a0e27;
+  --pixel-border-color: #00ff41;
+  --pixel-glow-shadow: 0 0 10px currentColor, 0 0 20px currentColor;
 }
+
 
 @layer base {
   * {
@@ -224,6 +234,36 @@
     pointer-events: none;
     z-index: 10;
   }
+
+  .pixel-glow {
+    text-shadow: var(--pixel-glow-shadow);
+  }
+
+  .pixel-border {
+    border: 2px solid var(--pixel-border-color);
+    box-shadow: inset 0 0 0 1px color-mix(in oklab, var(--pixel-border-color), black 35%);
+  }
+
+  .pixel-scanline {
+    position: relative;
+    overflow: hidden;
+  }
+
+  .pixel-scanline::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: repeating-linear-gradient(
+      0deg,
+      rgba(0, 0, 0, 0.15),
+      rgba(0, 0, 0, 0.15) 1px,
+      transparent 1px,
+      transparent 2px
+    );
+    pointer-events: none;
+    z-index: 10;
+  }
+
 
   .glitch {
     animation: glitch 0.4s ease-in-out;

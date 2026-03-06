@@ -146,3 +146,21 @@
 **Đã chọn: Retro Arcade Cyberpunk**
 
 Lý do: Phù hợp với tên "Pixel Rogue" và tạo cảm giác game retro thú vị, năng lượng cao, thu hút người chơi. Neon colors và pixelated aesthetic sẽ làm game nổi bật và dễ nhớ.
+
+## Pixel Theme Guideline (Artist + Dev)
+
+Nguồn chuẩn: `client/src/lib/pixelTheme.ts`.
+
+- Chỉ dùng token trong `PIXEL_THEME` cho màu chủ đạo, không hardcode hex mới trong UI gameplay.
+- Palette được giới hạn 16–32 màu để giữ chất pixel retro; ưu tiên tái sử dụng các màu neon + slate hiện có.
+- Scale pixel thống nhất: `x1`, `x2`, `x4` (1/2/4) cho icon, border và avatar.
+- Nhóm màu semantic cần bám theo token:
+  - `monster`, `class`, `consumable`, `weapon`, `armor`, `accessory`, `rarity`.
+- Hiệu ứng dùng class chung:
+  - `pixel-scanline`: scanline overlay.
+  - `pixel-glow`: glow text/icon.
+  - `pixel-border`: border kiểu pixel.
+- Border/shadow rule:
+  - Border pixel chuẩn `2px solid` theo token.
+  - Shadow pixel cỡ nhỏ (`0 0 4px`) cho điểm sáng/ô pixel.
+- Khi thêm màn hình mới: mapping semantic trước, rồi mới chọn component style để tránh lệch theme giữa code và asset.

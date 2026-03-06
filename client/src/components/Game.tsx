@@ -5,6 +5,7 @@ import {
   ShoppingBag, ArrowRight, Backpack, Activity, User, X, 
   Store, Hammer, Zap, Shirt, Sparkles, Gift, Lock, Minus, Plus, ChevronRight, ChevronLeft, Flame, Droplets, Snowflake, Hourglass, Star, Scroll, Cross, Book, Crown, Wand, Package, Syringe, Search, Info
 } from 'lucide-react';
+import { PIXEL_AVATAR_COLORS, PIXEL_THEME } from '@/lib/pixelTheme';
 
 // --- CONFIGURATION ---
 const ITEMS_PER_PAGE = 20;
@@ -52,7 +53,7 @@ const renderIcon = (Icon, size = 16, className = "") => {
 // --- DATA DATABASES ---
 const CLASSES_DB = {
   warrior: {
-    id: 'warrior', name: 'Chiến Binh', icon: Sword, color: 'text-red-500',
+    id: 'warrior', name: 'Chiến Binh', icon: Sword, color: PIXEL_THEME.groups.class.warrior,
     desc: 'Bậc thầy cận chiến. Sức chống chịu cao.',
     baseMod: { atk: 2, def: 2, maxHp: 30, luck: 0 },
     allowed: { weapon: ['SWORD', 'AXE'], armor: ['HEAVY', 'PLATE'] },
@@ -63,7 +64,7 @@ const CLASSES_DB = {
     ]
   },
   rogue: {
-    id: 'rogue', name: 'Sát Thủ', icon: Skull, color: 'text-green-400',
+    id: 'rogue', name: 'Sát Thủ', icon: Skull, color: PIXEL_THEME.groups.class.rogue,
     desc: 'Nhanh nhẹn và may mắn. Gây sát thương chí mạng.',
     baseMod: { atk: 4, def: 0, maxHp: -10, luck: 5, crit: 10 },
     allowed: { weapon: ['DAGGER', 'BOW'], armor: ['LIGHT', 'LEATHER'] },
@@ -74,7 +75,7 @@ const CLASSES_DB = {
     ]
   },
   mage: {
-    id: 'mage', name: 'Pháp Sư', icon: Wand, color: 'text-purple-400',
+    id: 'mage', name: 'Pháp Sư', icon: Wand, color: PIXEL_THEME.groups.class.mage,
     desc: 'Sức mạnh phép thuật hủy diệt nhưng máu thấp.',
     baseMod: { atk: 8, def: -1, maxHp: -20, luck: 2 },
     allowed: { weapon: ['STAFF', 'WAND'], armor: ['ROBE', 'CLOTH'] },
@@ -85,7 +86,7 @@ const CLASSES_DB = {
     ]
   },
   cleric: {
-    id: 'cleric', name: 'Mục Sư', icon: Cross, color: 'text-yellow-400',
+    id: 'cleric', name: 'Mục Sư', icon: Cross, color: PIXEL_THEME.groups.class.cleric,
     desc: 'Khả năng hồi phục và sinh tồn tuyệt vời.',
     baseMod: { atk: 0, def: 3, maxHp: 40, luck: 0 },
     allowed: { weapon: ['MACE', 'STAFF'], armor: ['ROBE', 'PLATE'] },
@@ -98,19 +99,19 @@ const CLASSES_DB = {
 };
 
 const ZONES_DB = [
-  { id: 'z_forest', name: 'Rừng Độc', difficulty: 0, desc: 'Quái vật gây Độc.', color: 'text-green-400', bg: 'from-green-900 to-slate-900' },
-  { id: 'z_ruins', name: 'Tàn Tích', difficulty: 2, desc: 'Quái vật gây Choáng.', color: 'text-yellow-400', bg: 'from-yellow-900 to-slate-900' },
-  { id: 'z_dungeon', name: 'Hầm Ngục', difficulty: 5, desc: 'Quái vật gây Suy Yếu.', color: 'text-purple-400', bg: 'from-purple-900 to-slate-900' },
-  { id: 'z_hell', name: 'Địa Ngục', difficulty: 10, desc: 'Thử thách cực đại.', color: 'text-red-500', bg: 'from-red-900 to-orange-900' },
+  { id: 'z_forest', name: 'Rừng Độc', difficulty: 0, desc: 'Quái vật gây Độc.', color: PIXEL_THEME.groups.class.rogue, bg: 'from-green-900 to-slate-900' },
+  { id: 'z_ruins', name: 'Tàn Tích', difficulty: 2, desc: 'Quái vật gây Choáng.', color: PIXEL_THEME.groups.class.cleric, bg: 'from-yellow-900 to-slate-900' },
+  { id: 'z_dungeon', name: 'Hầm Ngục', difficulty: 5, desc: 'Quái vật gây Suy Yếu.', color: PIXEL_THEME.groups.class.mage, bg: 'from-purple-900 to-slate-900' },
+  { id: 'z_hell', name: 'Địa Ngục', difficulty: 10, desc: 'Thử thách cực đại.', color: PIXEL_THEME.groups.class.warrior, bg: 'from-red-900 to-orange-900' },
 ];
 
 const EFFECTS_DB = {
-  STRONG_ATK: { id: 'eff_strong', name: 'Tăng Lực', type: 'BUFF', icon: Sword, color: 'text-red-400', desc: '+5 ATK', mods: { atk: 5 } },
+  STRONG_ATK: { id: 'eff_strong', name: 'Tăng Lực', type: 'BUFF', icon: Sword, color: PIXEL_THEME.groups.weapon.text, desc: '+5 ATK', mods: { atk: 5 } },
   REGEN: { id: 'eff_regen', name: 'Hồi Phục', type: 'BUFF', icon: Heart, color: 'text-pink-400', desc: '+3 HP/lượt', dot: { type: 'HP_FLAT', val: 3 } },
-  POISON: { id: 'eff_poison', name: 'Trúng Độc', type: 'DEBUFF', icon: Droplets, color: 'text-green-400', desc: '-4 HP/lượt', dot: { type: 'HP_FLAT', val: -4 } },
-  SHIELD: { id: 'eff_shield', name: 'Lá Chắn', type: 'BUFF', icon: Shield, color: 'text-blue-300', desc: 'Hấp thụ 20 ST', shieldVal: 20 },
-  STUN: { id: 'eff_stun', name: 'Choáng', type: 'DEBUFF', icon: StarsIcon, color: 'text-yellow-400', desc: 'Mất lượt', isStun: true },
-  VULNERABLE: { id: 'eff_vuln', name: 'Suy Yếu', type: 'DEBUFF', icon: BrokenShieldIcon, color: 'text-purple-400', desc: '+20% ST nhận vào', incomingPercent: 20 },
+  POISON: { id: 'eff_poison', name: 'Trúng Độc', type: 'DEBUFF', icon: Droplets, color: PIXEL_THEME.groups.consumable.text, desc: '-4 HP/lượt', dot: { type: 'HP_FLAT', val: -4 } },
+  SHIELD: { id: 'eff_shield', name: 'Lá Chắn', type: 'BUFF', icon: Shield, color: PIXEL_THEME.groups.armor.text, desc: 'Hấp thụ 20 ST', shieldVal: 20 },
+  STUN: { id: 'eff_stun', name: 'Choáng', type: 'DEBUFF', icon: StarsIcon, color: PIXEL_THEME.groups.accessory.text, desc: 'Mất lượt', isStun: true },
+  VULNERABLE: { id: 'eff_vuln', name: 'Suy Yếu', type: 'DEBUFF', icon: BrokenShieldIcon, color: PIXEL_THEME.groups.class.mage, desc: '+20% ST nhận vào', incomingPercent: 20 },
 };
 
 const ROOM_TYPES = {
@@ -129,11 +130,11 @@ const MOVES = {
 };
 
 const RARITY_CONFIG = {
-  1: { name: 'Thường', color: 'border-slate-500 text-slate-300', bg: 'bg-slate-800', affixes: 0, weight: 60 },
-  2: { name: 'Hiếm', color: 'border-green-500 text-green-400', bg: 'bg-slate-800', affixes: 1, weight: 30 },
-  3: { name: 'Cao Cấp', color: 'border-blue-500 text-blue-400', bg: 'bg-slate-900', affixes: 2, weight: 15 },
-  4: { name: 'Sử Thi', color: 'border-purple-500 text-purple-400', bg: 'bg-slate-900', affixes: 3, weight: 5 },
-  5: { name: 'Huyền Thoại', color: 'border-orange-500 text-orange-400', bg: 'bg-slate-950', affixes: 4, weight: 1 },
+  1: { ...PIXEL_THEME.groups.rarity[1], affixes: 0, weight: 60 },
+  2: { ...PIXEL_THEME.groups.rarity[2], affixes: 1, weight: 30 },
+  3: { ...PIXEL_THEME.groups.rarity[3], affixes: 2, weight: 15 },
+  4: { ...PIXEL_THEME.groups.rarity[4], affixes: 3, weight: 5 },
+  5: { ...PIXEL_THEME.groups.rarity[5], affixes: 4, weight: 1 },
 };
 
 const AFFIX_DB = [
@@ -449,9 +450,9 @@ const PixelAvatar = ({ seed, size = 100, type = 'hero', isDead = false }) => {
     ctx.clearRect(0, 0, canvas.width, canvas.height);
     
     let colors = [];
-    if (type === 'hero') colors = ['#3b82f6', '#1d4ed8', '#93c5fd', '#fcd34d'];
-    else if (type === 'monster') colors = ['#ef4444', '#7f1d1d', '#10b981', '#7c3aed', '#f59e0b'];
-    else if (type === 'boss') colors = ['#7c3aed', '#4c1d95', '#c4b5fd', '#ffffff'];
+    if (type === 'hero') colors = [...PIXEL_AVATAR_COLORS.hero];
+    else if (type === 'monster') colors = [...PIXEL_AVATAR_COLORS.monster];
+    else if (type === 'boss') colors = [...PIXEL_AVATAR_COLORS.boss];
     
     const random = (s) => { 
       const x = Math.sin(s) * 10000; 
@@ -462,7 +463,7 @@ const PixelAvatar = ({ seed, size = 100, type = 'hero', isDead = false }) => {
       for (let x = 0; x < gridSize / 2; x++) {
         if (random(seed + x * y * 13) > 0.5) {
           const color = colors[Math.floor(random(seed + x + y) * colors.length)];
-          ctx.fillStyle = isDead ? '#4b5563' : color;
+          ctx.fillStyle = isDead ? PIXEL_AVATAR_COLORS.dead : color;
           ctx.fillRect(x * pixelSize, y * pixelSize, pixelSize, pixelSize); 
           ctx.fillRect((gridSize - 1 - x) * pixelSize, y * pixelSize, pixelSize, pixelSize);
         }
@@ -1048,7 +1049,7 @@ function Game() {
               style={{ 
                 left: `${e.x}%`, 
                 top: `${e.y}%`, 
-                color: e.type === 'damage' ? '#ef4444' : '#10b981',
+                color: e.type === 'damage' ? PIXEL_THEME.groups.monster.accent : PIXEL_THEME.palette.emerald500,
                 transform: 'translate(-50%, -50%)'
               }}
             >
@@ -1059,7 +1060,7 @@ function Game() {
           {/* GAME STATES */}
           {gameState === GAME_STATE.MENU && (
             <div className="h-full flex flex-col items-center justify-center gap-6 bg-black/80 z-10 p-4">
-              <h1 className="text-4xl font-black text-blue-500 text-center">PIXEL ROGUE</h1>
+              <h1 className={`text-4xl font-black text-center ${PIXEL_THEME.groups.armor.text} ${PIXEL_THEME.fx.glowClass}`}>PIXEL ROGUE</h1>
               <div className="text-slate-400 text-sm text-center max-w-xs">
                 Game nhập vai chiến đấu theo lượt với hệ thống vật phẩm và nâng cấp phong phú
               </div>

@@ -4,6 +4,8 @@
  * Design: Retro Arcade Cyberpunk - simple pixelated style
  */
 
+import { PIXEL_AVATAR_COLORS, PIXEL_THEME } from '@/lib/pixelTheme';
+
 interface PixelAvatarProps {
   seed: number;
   size: number;
@@ -17,7 +19,6 @@ export default function PixelAvatar({
   type = 'hero',
   isDead = false,
 }: PixelAvatarProps) {
-  // Generate deterministic pixel pattern based on seed
   const generatePixels = (s: number) => {
     const pixels: boolean[][] = [];
     const gridSize = 8;
@@ -37,18 +38,13 @@ export default function PixelAvatar({
   const pixelSize = size / 8;
 
   const getColor = () => {
-    if (isDead) return '#333333';
-    switch (type) {
-      case 'monster':
-        return '#ff006e';
-      case 'boss':
-        return '#ff00ff';
-      default:
-        return '#00ff41';
-    }
+    if (isDead) return PIXEL_THEME.palette.gray800;
+    if (type === 'monster') return PIXEL_THEME.palette.neonPink;
+    if (type === 'boss') return PIXEL_THEME.palette.neonPurple;
+    return PIXEL_THEME.palette.neonGreen;
   };
 
-  const backgroundColor = isDead ? '#1a1a1a' : '#0a0e27';
+  const backgroundColor = isDead ? PIXEL_AVATAR_COLORS.deadBg : PIXEL_THEME.palette.void900;
   const pixelColor = getColor();
 
   return (
@@ -60,7 +56,7 @@ export default function PixelAvatar({
         gridTemplateColumns: 'repeat(8, 1fr)',
         gap: 0,
         backgroundColor,
-        border: `2px solid ${pixelColor}`,
+        border: `${PIXEL_THEME.rules.pixelBorderWidth}px ${PIXEL_THEME.rules.borderStyle} ${pixelColor}`,
         opacity: isDead ? 0.5 : 1,
         filter: isDead ? 'grayscale(1)' : 'none',
       }}
@@ -73,7 +69,7 @@ export default function PixelAvatar({
               backgroundColor: isActive ? pixelColor : 'transparent',
               width: pixelSize,
               height: pixelSize,
-              boxShadow: isActive ? `0 0 4px ${pixelColor}` : 'none',
+              boxShadow: isActive ? `${PIXEL_THEME.rules.shadowSm} ${pixelColor}` : 'none',
             }}
           />
         ))
