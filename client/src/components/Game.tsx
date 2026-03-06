@@ -136,6 +136,21 @@ const RARITY_CONFIG = {
   5: { name: 'Huyền Thoại', color: 'border-orange-500 text-orange-400', bg: 'bg-slate-950', affixes: 4, weight: 1 },
 };
 
+const ITEM_TYPE_UI = {
+  CONSUMABLE: { label: 'Consumable', chip: 'text-cyan-200 bg-cyan-950 border-cyan-500', marker: 'vial', markerColor: 'text-cyan-300' },
+  WEAPON: { label: 'Weapon', chip: 'text-red-200 bg-red-950 border-red-500', marker: 'blade', markerColor: 'text-red-300' },
+  ARMOR: { label: 'Armor', chip: 'text-blue-200 bg-blue-950 border-blue-500', marker: 'shield', markerColor: 'text-blue-300' },
+  ACCESSORY: { label: 'Accessory', chip: 'text-fuchsia-200 bg-fuchsia-950 border-fuchsia-500', marker: 'gem', markerColor: 'text-fuchsia-300' },
+  SERVICE: { label: 'Service', chip: 'text-amber-200 bg-amber-950 border-amber-500', marker: 'gem', markerColor: 'text-amber-300' },
+};
+
+const ITEM_TYPE_MARKERS = {
+  vial: Droplets,
+  blade: Sword,
+  shield: Shield,
+  gem: Sparkles,
+};
+
 const AFFIX_DB = [
   { id: 'sharp', name: 'Sắc Bén', stat: 'atk', val: 1, type: ['WEAPON'] },
   { id: 'heavy', name: 'Nặng Ký', stat: 'atk', val: 2, type: ['WEAPON'] },
@@ -954,7 +969,18 @@ function Game() {
   }, [player.gold, player.classId, stats.maxHp, floor, addLog]);
 
   // --- RENDER HELPERS ---
-  const renderItemCard = (item, onClick, isSelected, badge = '') => {
+  const renderTypeMarker = (itemType) => {
+    const typeUi = ITEM_TYPE_UI[itemType] || ITEM_TYPE_UI.ACCESSORY;
+    const MarkerIcon = ITEM_TYPE_MARKERS[typeUi.marker] || Sparkles;
+    return (
+      <div className="absolute bottom-0 right-0 bg-black/70 rounded-tl p-0.5 z-10">
+        <MarkerIcon size={8} className={typeUi.markerColor} />
+      </div>
+    );
+  };
+
+  const renderItemCard = (item, onClick, isSelected, badge = '', options = {}) => {
+    const { showTypeMarker = true, interactive = true } = options;
     if (!item) return (
       <div onClick={onClick} className="aspect-square bg-slate-900 border border-slate-800 rounded opacity-50 flex items-center justify-center text-slate-700">
         <Shirt size={16}/>
@@ -965,8 +991,10 @@ function Game() {
     return (
       <div 
         onClick={onClick} 
-        className={`relative aspect-square ${rarity.bg} border-2 rounded p-1 cursor-pointer group hover:brightness-125 ${rarity.color} ${isSelected ? 'ring-2 ring-white scale-95' : ''}`}
+        className={`relative aspect-square ${rarity.bg} border-2 rounded p-1 group ${interactive ? 'cursor-pointer hover:brightness-125' : ''} ${rarity.color} ${isSelected ? 'ring-2 ring-white scale-95' : ''}`}
+        style={{ imageRendering: 'pixelated' }}
       >
+        <div className="pointer-events-none absolute inset-0 border border-black/50 [clip-path:polygon(0_4px,4px_4px,4px_0,calc(100%-4px)_0,calc(100%-4px)_4px,100%_4px,100%_calc(100%-4px),calc(100%-4px)_calc(100%-4px),calc(100%-4px)_100%,4px_100%,4px_calc(100%-4px),0_calc(100%-4px))]" />
         {item.type !== 'CONSUMABLE' && (
           <div className="absolute top-0 right-0 bg-black/60 text-white text-[8px] px-1 rounded-bl z-10">
             +{item.level}
@@ -985,6 +1013,7 @@ function Game() {
             <Sparkles size={8}/>
           </div>
         )}
+        {showTypeMarker && renderTypeMarker(item.type)}
       </div>
     );
   };
@@ -1462,17 +1491,12 @@ function Game() {
                         <div className="text-[10px] text-slate-500 uppercase mb-1">
                           {slot === 'weapon' ? 'Vũ Khí' : slot === 'armor' ? 'Giáp' : 'Phụ Kiện'}
                         </div>
-                        {player.equipment[slot] ? (
-                          <div 
-                            onClick={() => setSelectedItem({...player.equipment[slot], isEquipped: true, slot})}
-                            className={`aspect-square border-2 rounded p-1 cursor-pointer bg-slate-800 ${RARITY_CONFIG[player.equipment[slot].rarity].color}`}
-                          >
-                            {renderIcon(player.equipment[slot].icon, 24)}
-                          </div>
-                        ) : (
-                          <div className="aspect-square bg-slate-900 border border-slate-800 rounded opacity-50 flex items-center justify-center">
-                            <Shirt size={16}/>
-                          </div>
+                        {renderItemCard(
+                          player.equipment[slot],
+                          player.equipment[slot] ? () => setSelectedItem({ ...player.equipment[slot], isEquipped: true, slot }) : undefined,
+                          selectedItem?.uid === player.equipment[slot]?.uid,
+                          '',
+                          { showTypeMarker: true }
                         )}
                       </div>
                     ))}
@@ -1504,17 +1528,8 @@ function Game() {
 
                 <div className="grid grid-cols-4 gap-2 min-h-[200px] content-start">
                   {currentInventoryPage.map(i => (
-                    <div 
-                      key={i.uid}
-                      onClick={() => setSelectedItem(i)}
-                      className={`aspect-square border-2 rounded p-1 cursor-pointer bg-slate-800 hover:brightness-125 ${RARITY_CONFIG[i.rarity].color}`}
-                    >
-                      {renderIcon(i.icon, 24)}
-                      {i.level > 1 && (
-                        <div className="absolute top-0 right-0 bg-black/60 text-white text-[8px] px-1 rounded-bl">
-                          +{i.level}
-                        </div>
-                      )}
+                    <div key={i.uid}>
+                      {renderItemCard(i, () => setSelectedItem(i), selectedItem?.uid === i.uid)}
                     </div>
                   ))}
                   {Array.from({ length: Math.max(0, ITEMS_PER_PAGE - currentInventoryPage.length) }).map((_, i) => (
@@ -1528,24 +1543,42 @@ function Game() {
 
               {selectedItem && selectedItem.uid && (
                 <div className="bg-slate-800 p-4 border-t border-slate-700">
-                  <div className={`font-bold text-lg mb-1 ${RARITY_CONFIG[selectedItem.rarity].color.replace('border-', 'text-')}`}>
+                  <div className={`font-bold text-lg mb-2 ${RARITY_CONFIG[selectedItem.rarity].color.replace('border-', 'text-')}`}>
                     {selectedItem.name} {selectedItem.level ? `+${selectedItem.level}` : ''}
                   </div>
-                  <div className="text-xs text-slate-500 mb-2 uppercase font-bold">
-                    {selectedItem.type} • {RARITY_CONFIG[selectedItem.rarity].name}
+
+                  <div className="flex gap-2 mb-3 text-[10px] font-bold uppercase tracking-wide">
+                    <span className={`relative inline-flex items-center border px-2 py-0.5 ${ITEM_TYPE_UI[selectedItem.type]?.chip || ITEM_TYPE_UI.ACCESSORY.chip}`}>
+                      <span className="pointer-events-none absolute inset-0 border border-black/50 [clip-path:polygon(0_3px,3px_3px,3px_0,calc(100%-3px)_0,calc(100%-3px)_3px,100%_3px,100%_calc(100%-3px),calc(100%-3px)_calc(100%-3px),calc(100%-3px)_100%,3px_100%,3px_calc(100%-3px),0_calc(100%-3px))]" />
+                      <span className="relative">{ITEM_TYPE_UI[selectedItem.type]?.label || selectedItem.type}</span>
+                    </span>
+                    <span className={`relative inline-flex items-center border px-2 py-0.5 ${RARITY_CONFIG[selectedItem.rarity].color.replace('border-', 'text-').replace('text-', 'border-')} ${RARITY_CONFIG[selectedItem.rarity].bg}`}>
+                      <span className="pointer-events-none absolute inset-0 border border-black/50 [clip-path:polygon(0_3px,3px_3px,3px_0,calc(100%-3px)_0,calc(100%-3px)_3px,100%_3px,100%_calc(100%-3px),calc(100%-3px)_calc(100%-3px),calc(100%-3px)_100%,3px_100%,3px_calc(100%-3px),0_calc(100%-3px))]" />
+                      <span className="relative">{RARITY_CONFIG[selectedItem.rarity].name}</span>
+                    </span>
                   </div>
                   
                   {selectedItem.type !== 'CONSUMABLE' && (
                     <div className="bg-slate-900 p-2 rounded mb-3 text-xs space-y-1">
-                      {Object.entries(getItemStats(selectedItem)).map(([k, v]) => (
-                        <div key={k} className="flex justify-between text-slate-300">
+                      {Object.entries(getItemStats(selectedItem)).map(([k, v], idx) => (
+                        <div key={k} className={`flex justify-between ${idx === 0 ? 'text-white font-bold' : 'text-slate-300'}`}>
                           <span className="uppercase">{k}</span>
-                          <span className="text-white font-bold">
+                          <span className={idx === 0 ? 'text-green-300 font-bold' : 'text-white font-bold'}>
                             {v} 
                             <span className="text-slate-500 font-normal ml-1">
                               ({selectedItem.baseStats?.[k] || 0} gốc + {v - (selectedItem.baseStats?.[k] || 0)} cấp)
                             </span>
                           </span>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+
+                  {!!selectedItem.affixes?.length && (
+                    <div className="mb-3 space-y-1 text-xs">
+                      {selectedItem.affixes.map((affix, index) => (
+                        <div key={`${affix.id}-${index}`} className="text-violet-300">
+                          • {affix.name}: +{Math.floor(affix.val * (1 + 0.12 * ((selectedItem.level || 1) - 1)))} {affix.stat.toUpperCase()}
                         </div>
                       ))}
                     </div>
@@ -1631,8 +1664,8 @@ function Game() {
                       item.type === 'SERVICE' ? 'border-blue-500' : RARITY_CONFIG[item.rarity || 1].color.replace('text-', 'border-')
                     }`}
                   >
-                    <div className="text-2xl">
-                      {renderIcon(item.icon, 24)}
+                    <div className="w-12 shrink-0">
+                      {renderItemCard(item, undefined, false, '', { showTypeMarker: true, interactive: false })}
                     </div>
                     <div className="flex-1">
                       <div className="font-bold text-sm">
