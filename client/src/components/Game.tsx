@@ -5,7 +5,8 @@ import {
   ShoppingBag, ArrowRight, Backpack, Activity, User, X, 
   Store, Hammer, Zap, Shirt, Sparkles, Gift, Lock, Minus, Plus, ChevronRight, ChevronLeft, Flame, Droplets, Snowflake, Hourglass, Star, Scroll, Cross, Book, Crown, Wand, Package, Syringe, Search, Info
 } from 'lucide-react';
-import { PotStrengthSprite, getItemPaletteClass } from '@/assets/itemSprites';
+import { PotStrengthSprite } from '@/assets/itemSprites';
+import PixelItemIcon from '@/components/PixelItemIcon';
 
 // --- CONFIGURATION ---
 const ITEMS_PER_PAGE = 20;
@@ -979,7 +980,7 @@ function Game() {
           </div>
         )}
         <div className="flex items-center justify-center h-full text-2xl drop-shadow-md">
-          {renderIcon(item.icon, 24, getItemPaletteClass(item))}
+          <PixelItemIcon id={item.id} itemType={item.type} fallbackIcon={item.icon} size={24} />
         </div>
         {item.affixes?.length > 0 && (
           <div className="absolute top-0 left-0 text-yellow-400 text-[8px] p-0.5">
@@ -1468,7 +1469,7 @@ function Game() {
                             onClick={() => setSelectedItem({...player.equipment[slot], isEquipped: true, slot})}
                             className={`aspect-square border-2 rounded p-1 cursor-pointer bg-slate-800 ${RARITY_CONFIG[player.equipment[slot].rarity].color}`}
                           >
-                            {renderIcon(player.equipment[slot].icon, 24, getItemPaletteClass(player.equipment[slot]))}
+                            <PixelItemIcon id={player.equipment[slot].id} itemType={player.equipment[slot].type} fallbackIcon={player.equipment[slot].icon} size={24} />
                           </div>
                         ) : (
                           <div className="aspect-square bg-slate-900 border border-slate-800 rounded opacity-50 flex items-center justify-center">
@@ -1510,7 +1511,7 @@ function Game() {
                       onClick={() => setSelectedItem(i)}
                       className={`aspect-square border-2 rounded p-1 cursor-pointer bg-slate-800 hover:brightness-125 ${RARITY_CONFIG[i.rarity].color}`}
                     >
-                      {renderIcon(i.icon, 24, getItemPaletteClass(i))}
+                      <PixelItemIcon id={i.id} itemType={i.type} fallbackIcon={i.icon} size={24} />
                       {i.id === 'pot_str' && (
                         <div className="absolute bottom-0 left-0 bg-orange-600/90 text-white text-[8px] px-1 rounded-tr font-bold">
                           Buff
@@ -1535,7 +1536,7 @@ function Game() {
               {selectedItem && selectedItem.uid && (
                 <div className="bg-slate-800 p-4 border-t border-slate-700">
                   <div className="mb-2 text-2xl">
-                    {renderIcon(selectedItem.icon, 24, getItemPaletteClass(selectedItem))}
+                    <PixelItemIcon id={selectedItem.id} itemType={selectedItem.type} fallbackIcon={selectedItem.icon} size={24} />
                   </div>
                   <div className={`font-bold text-lg mb-1 ${RARITY_CONFIG[selectedItem.rarity].color.replace('border-', 'text-')}`}>
                     {selectedItem.name} {selectedItem.level ? `+${selectedItem.level}` : ''}
@@ -1646,7 +1647,7 @@ function Game() {
                     }`}
                   >
                     <div className="text-2xl">
-                      {renderIcon(item.icon, 24, getItemPaletteClass(item))}
+                      <PixelItemIcon id={item.id} itemType={item.type} fallbackIcon={item.icon} size={24} />
                     </div>
                     <div className="flex-1">
                       <div className="font-bold text-sm flex items-center gap-2">
