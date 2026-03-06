@@ -5,6 +5,7 @@ import {
   ShoppingBag, ArrowRight, Backpack, Activity, User, X, 
   Store, Hammer, Zap, Shirt, Sparkles, Gift, Lock, Minus, Plus, ChevronRight, ChevronLeft, Flame, Droplets, Snowflake, Hourglass, Star, Scroll, Cross, Book, Crown, Wand, Package, Syringe, Search, Info
 } from 'lucide-react';
+import { PotStrengthSprite, getItemPaletteClass } from '@/assets/itemSprites';
 
 // --- CONFIGURATION ---
 const ITEMS_PER_PAGE = 20;
@@ -152,7 +153,7 @@ const ITEMS_DB = [
   { id: 'respec', name: 'Sách Lãng Quên', type: 'CONSUMABLE', baseCost: 500, rarity: 4, desc: 'Reset điểm', effect: (p) => ({ ...p, statPoints: 5, skillPoints: 1, statsAllocated: { str: 0, agi: 0, vit: 0, luk: 0 }, skills: {} }), icon: Book },
   
   // Buffs
-  { id: 'pot_str', name: 'Thuốc Sức Mạnh', type: 'CONSUMABLE', baseCost: 40, rarity: 2, desc: '+5 ATK (3 lượt)', effect: (p) => ({ ...p, effects: [...p.effects, { ...EFFECTS_DB.STRONG_ATK, duration: 3, uid: Math.random() }] }), icon: Sword },
+  { id: 'pot_str', name: 'Thuốc Sức Mạnh', type: 'CONSUMABLE', baseCost: 40, rarity: 2, desc: '+5 ATK (3 lượt)', effect: (p) => ({ ...p, effects: [...p.effects, { ...EFFECTS_DB.STRONG_ATK, duration: 3, uid: Math.random() }] }), icon: PotStrengthSprite },
   { id: 'scroll_shield', name: 'Cuộn Bảo Vệ', type: 'CONSUMABLE', baseCost: 60, rarity: 3, desc: 'Tạo giáp ảo 20', effect: (p) => ({ ...p, effects: [...p.effects, { ...EFFECTS_DB.SHIELD, duration: 99, value: 20, uid: Math.random() }] }), icon: Scroll },
 
   // Equipment
@@ -978,7 +979,7 @@ function Game() {
           </div>
         )}
         <div className="flex items-center justify-center h-full text-2xl drop-shadow-md">
-          {renderIcon(item.icon, 24)}
+          {renderIcon(item.icon, 24, getItemPaletteClass(item))}
         </div>
         {item.affixes?.length > 0 && (
           <div className="absolute top-0 left-0 text-yellow-400 text-[8px] p-0.5">
@@ -1467,7 +1468,7 @@ function Game() {
                             onClick={() => setSelectedItem({...player.equipment[slot], isEquipped: true, slot})}
                             className={`aspect-square border-2 rounded p-1 cursor-pointer bg-slate-800 ${RARITY_CONFIG[player.equipment[slot].rarity].color}`}
                           >
-                            {renderIcon(player.equipment[slot].icon, 24)}
+                            {renderIcon(player.equipment[slot].icon, 24, getItemPaletteClass(player.equipment[slot]))}
                           </div>
                         ) : (
                           <div className="aspect-square bg-slate-900 border border-slate-800 rounded opacity-50 flex items-center justify-center">
@@ -1509,7 +1510,12 @@ function Game() {
                       onClick={() => setSelectedItem(i)}
                       className={`aspect-square border-2 rounded p-1 cursor-pointer bg-slate-800 hover:brightness-125 ${RARITY_CONFIG[i.rarity].color}`}
                     >
-                      {renderIcon(i.icon, 24)}
+                      {renderIcon(i.icon, 24, getItemPaletteClass(i))}
+                      {i.id === 'pot_str' && (
+                        <div className="absolute bottom-0 left-0 bg-orange-600/90 text-white text-[8px] px-1 rounded-tr font-bold">
+                          Buff
+                        </div>
+                      )}
                       {i.level > 1 && (
                         <div className="absolute top-0 right-0 bg-black/60 text-white text-[8px] px-1 rounded-bl">
                           +{i.level}
@@ -1528,11 +1534,19 @@ function Game() {
 
               {selectedItem && selectedItem.uid && (
                 <div className="bg-slate-800 p-4 border-t border-slate-700">
+                  <div className="mb-2 text-2xl">
+                    {renderIcon(selectedItem.icon, 24, getItemPaletteClass(selectedItem))}
+                  </div>
                   <div className={`font-bold text-lg mb-1 ${RARITY_CONFIG[selectedItem.rarity].color.replace('border-', 'text-')}`}>
                     {selectedItem.name} {selectedItem.level ? `+${selectedItem.level}` : ''}
                   </div>
                   <div className="text-xs text-slate-500 mb-2 uppercase font-bold">
                     {selectedItem.type} • {RARITY_CONFIG[selectedItem.rarity].name}
+                    {selectedItem.id === 'pot_str' && (
+                      <span className="ml-2 rounded bg-orange-500/20 px-1.5 py-0.5 text-[10px] text-orange-300 border border-orange-400/40">
+                        Buff
+                      </span>
+                    )}
                   </div>
                   
                   {selectedItem.type !== 'CONSUMABLE' && (
@@ -1632,11 +1646,16 @@ function Game() {
                     }`}
                   >
                     <div className="text-2xl">
-                      {renderIcon(item.icon, 24)}
+                      {renderIcon(item.icon, 24, getItemPaletteClass(item))}
                     </div>
                     <div className="flex-1">
-                      <div className="font-bold text-sm">
+                      <div className="font-bold text-sm flex items-center gap-2">
                         {item.name} {item.level ? `+${item.level}` : ''}
+                        {item.id === 'pot_str' && (
+                          <span className="rounded bg-orange-500/20 px-1.5 py-0.5 text-[10px] text-orange-300 border border-orange-400/40 uppercase">
+                            Buff
+                          </span>
+                        )}
                       </div>
                       <div className="text-[10px] text-slate-400">
                         {item.desc || (item.baseCost + ' G')}

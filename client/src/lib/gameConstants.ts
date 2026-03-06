@@ -382,7 +382,7 @@ export const ITEMS_DB: any[] = [
     baseCost: 40,
     rarity: 2,
     desc: '+5 ATK (3 luot)',
-    icon: '⚔️',
+    icon: 'pot_str_sprite',
   },
   {
     id: 'scroll_shield',
