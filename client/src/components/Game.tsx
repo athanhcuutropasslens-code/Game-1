@@ -3,7 +3,7 @@ import React, { useState, useEffect, useRef, useMemo, useCallback } from 'react'
 import { 
   Heart, Shield, Sword, Coins, Skull, 
   ArrowRight, Backpack, Activity, User, X, 
-  Store, Hammer, Zap, Shirt, Sparkles, Gift, Lock, Minus, Plus, ChevronRight, ChevronLeft, Droplets, Star, Scroll, Cross, Book, Wand, Package, Syringe, Search, Map as MapIcon, Footprints, Info
+  Store, Hammer, Zap, Shirt, Sparkles, Gift, Lock, Minus, Plus, ChevronRight, ChevronLeft, Droplets, Star, Scroll, Cross, Book, Wand, Package, Syringe, Search, Footprints, Info
 } from 'lucide-react';
 import PixelItemIcon from '@/components/PixelItemIcon';
 
@@ -190,6 +190,24 @@ const MONSTER_TYPE_MAP = {
 const randomId = () => Math.random().toString(36).substring(2, 11);
 const clamp = (n, min, max) => Math.max(min, Math.min(max, n));
 const findZone = (zoneId) => ZONES_DB.find((z) => z.id === zoneId) || ZONES_DB[0];
+const createInitialPlayer = () => ({
+  classId: null,
+  level: 1,
+  exp: 0,
+  nextLevelExp: 100,
+  statPoints: 0,
+  skillPoints: 0,
+  hp: 100,
+  gold: 100,
+  baseStats: { maxHp: 100, atk: 2, def: 0, luck: 0, diceSides: 6 },
+  statsAllocated: { str: 0, agi: 0, vit: 0, luk: 0 },
+  skills: {},
+  effects: [],
+  inventory: [],
+  equipment: { weapon: null, armor: null, accessory: null },
+  seed: Math.floor(Math.random() * 10000),
+  maxFloor: 1,
+});
 
 const processEffects = (entity, maxHp) => {
   let hp = entity.hp;
@@ -687,24 +705,7 @@ function Game() {
   const [inventoryPage, setInventoryPage] = useState(0);
   const [selectionUID, setSelectionUID] = useState(null);
 
-  const [player, setPlayer] = useState({ 
-    classId: null, 
-    level: 1, 
-    exp: 0, 
-    nextLevelExp: 100, 
-    statPoints: 0, 
-    skillPoints: 0, 
-    hp: 100, 
-    gold: 100, 
-    baseStats: { maxHp: 100, atk: 2, def: 0, luck: 0, diceSides: 6 }, 
-    statsAllocated: { str: 0, agi: 0, vit: 0, luk: 0 }, 
-    skills: {}, 
-    effects: [], 
-    inventory: [], 
-    equipment: { weapon: null, armor: null, accessory: null }, 
-    seed: Math.floor(Math.random() * 10000),
-    maxFloor: 1
-  });
+  const [player, setPlayer] = useState(createInitialPlayer);
   
   const [monster, setMonster] = useState(null);
   const [animState, setAnimState] = useState({ p: '', m: '' });
@@ -746,7 +747,7 @@ function Game() {
 
 
   const initGame = useCallback(() => {
-    setPlayer({ classId: null, level: 1, exp: 0, nextLevelExp: 100, statPoints: 0, skillPoints: 0, hp: 100, gold: 100, baseStats: { maxHp: 100, atk: 2, def: 0, luck: 0, diceSides: 6 }, statsAllocated: { str: 0, agi: 0, vit: 0, luk: 0 }, skills: {}, effects: [], inventory: [], equipment: { weapon: null, armor: null, accessory: null }, seed: Math.floor(Math.random() * 10000), maxFloor: 1 });
+    setPlayer(createInitialPlayer());
     setSelectionUID(null);
     setLoot(null);
     setMonster(null);
@@ -780,7 +781,10 @@ function Game() {
   }, [player.maxFloor, addLog]);
 
   const enterZone = useCallback((z) => { setZone(z); setFloor(1); startFloor(1, z.id); }, [startFloor]);
-  const openTravelModal = useCallback(() => setActiveModal(MODAL_STATE.TRAVEL), []);
+  const openTravelModal = useCallback(() => {
+    if ((player.maxFloor || 1) <= 1) return;
+    setActiveModal(MODAL_STATE.TRAVEL);
+  }, [player.maxFloor]);
   const travelToFloor = useCallback((targetFloor) => {
     if (targetFloor > (player.maxFloor || 1)) return;
     setFloor(targetFloor);
@@ -986,8 +990,8 @@ function Game() {
           </div>
           <div className="flex gap-2">
             {gameState === GAME_STATE.MAP && (player.maxFloor || 1) > 1 && (
-              <button onClick={openTravelModal} className="p-2 rounded hover:bg-slate-700">
-                <MapIcon size={18}/>
+              <button onClick={openTravelModal} className="p-2 rounded hover:bg-slate-700" title="Di chuyển tầng">
+                <Footprints size={18}/>
               </button>
             )}
             <button 
@@ -1092,6 +1096,11 @@ function Game() {
               <h2 className={`text-2xl font-black ${zone.color} mb-2`}>
                 {zone.name} - Tầng {floor}
               </h2>
+              <div className="mb-2 flex items-center gap-2 text-[11px] font-bold">
+                <span className={`rounded-full border px-2 py-1 ${floor === (player.maxFloor || 1) ? 'border-yellow-500 text-yellow-300 bg-yellow-500/10' : 'border-green-500 text-green-300 bg-green-500/10'}`}>
+                  {floor === (player.maxFloor || 1) ? 'Tầng hiện tại' : 'Tầng đã dọn'}
+                </span>
+              </div>
               <div className="mb-4 text-center text-xs text-slate-400 max-w-xs">{zone.desc}</div>
               <div className="mb-4 grid grid-cols-2 gap-2 w-full max-w-xs text-[10px]">
                 <div className="rounded border border-slate-700 bg-black/30 p-2 text-slate-300">May mắn: <span className="text-yellow-400 font-bold">{currentRealStats.luck}</span></div>
@@ -1115,7 +1124,11 @@ function Game() {
                   >
                     <div className="flex items-center justify-between">
                       <span className="flex items-center gap-2">{renderIcon(ROOM_TYPES[r.type].icon, 14, ROOM_TYPES[r.type].color)}{ROOM_TYPES[r.type].label}</span>
-                      {r.completed && <span className="text-green-400">✓</span>}
+                      {r.completed && (
+                        <span className={`text-[10px] font-bold ${r.id === currentRoomId ? 'text-yellow-300' : 'text-green-400'}`}>
+                          {r.id === currentRoomId ? 'Hiện tại' : 'Đã dọn'}
+                        </span>
+                      )}
                       {r.locked && <Lock size={12} />}
                     </div>
                   </button>
@@ -1444,11 +1457,29 @@ function Game() {
                 <button onClick={() => setActiveModal(MODAL_STATE.NONE)}><X/></button>
               </div>
               <div className="p-4 grid grid-cols-2 gap-2">
-                {Array.from({ length: player.maxFloor || 1 }, (_, idx) => idx + 1).map((f) => (
-                  <button key={f} onClick={() => travelToFloor(f)} className={`rounded border p-3 text-sm font-bold ${f === floor ? 'border-yellow-500 bg-slate-700' : 'border-slate-700 bg-slate-800 hover:border-cyan-400'}`}>
-                    Tầng {f} {f === floor ? '• Hiện tại' : ''}
-                  </button>
-                ))}
+                {Array.from({ length: player.maxFloor || 1 }, (_, idx) => idx + 1).map((f) => {
+                  const isCurrentFloor = f === floor;
+                  const isClearedFloor = f < (player.maxFloor || 1);
+
+                  return (
+                    <button
+                      key={f}
+                      onClick={() => travelToFloor(f)}
+                      className={`rounded border p-3 text-sm font-bold text-left transition-colors ${
+                        isCurrentFloor
+                          ? 'border-yellow-500 bg-slate-700 text-yellow-200'
+                          : isClearedFloor
+                          ? 'border-green-600 bg-green-950/40 text-green-200 hover:border-green-400'
+                          : 'border-cyan-600 bg-slate-800 text-cyan-200 hover:border-cyan-400'
+                      }`}
+                    >
+                      <div>Tầng {f}</div>
+                      <div className={`mt-1 text-[10px] ${isCurrentFloor ? 'text-yellow-300' : isClearedFloor ? 'text-green-300' : 'text-cyan-300'}`}>
+                        {isCurrentFloor ? 'Đang đứng tại đây' : isClearedFloor ? 'Đã dọn, có thể quay lại' : 'Điểm tiến độ cao nhất'}
+                      </div>
+                    </button>
+                  );
+                })}
               </div>
             </div>
           )}
