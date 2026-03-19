@@ -42,7 +42,7 @@ pnpm build
 
 ## Trò Chơi Online
 
-Truy cập: [Link công khai sẽ được cập nhật]
+Truy cập: https://athanhcuutropasslens-code.github.io/Game-1/
 
 ---
 
