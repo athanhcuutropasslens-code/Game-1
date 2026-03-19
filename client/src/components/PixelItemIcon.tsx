@@ -39,6 +39,8 @@ const PixelItemIcon = ({
   if (!pixelData) return renderFallbackIcon(fallbackIcon, size, className);
 
   const scaledSize = Math.max(16, Math.round(size));
+  const tileOffsetX = pixelData.tile * -scaledSize;
+
   return (
     <span
       className={className}
@@ -48,8 +50,9 @@ const PixelItemIcon = ({
         height: scaledSize,
         backgroundImage: `url(${pixelData.atlasUrl})`,
         backgroundSize: 'auto 100%',
-        backgroundPositionX: `${pixelData.tile * -pixelData.tileSize}px`,
+        backgroundPositionX: `${tileOffsetX}px`,
         backgroundPositionY: '0px',
+        backgroundRepeat: 'no-repeat',
         imageRendering: 'pixelated',
       }}
       aria-hidden="true"
