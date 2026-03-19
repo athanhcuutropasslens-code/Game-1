@@ -14,7 +14,7 @@ if (!itemsBlock) {
   throw new Error('Could not find ITEMS_DB block in client/src/components/Game.tsx');
 }
 
-const itemIds = [...itemsBlock[1].matchAll(/\bid:\s*'([a-z0-9_]+)'/g)].map((m) => m[1]);
+const itemIds = [...itemsBlock[1].matchAll(/\bid:\s*['"]([a-z0-9_]+)['"]/g)].map((m) => m[1]);
 const uniqueItemIds = [...new Set(itemIds)];
 
 const mapSource = fs.readFileSync(iconMapFile, 'utf8');
