@@ -81,7 +81,7 @@ export const buyService = ({
   random = Math.random,
 }: any) => {
   if (player.gold < service.cost)
-    return { ok: false, reason: "NOT_ENOUGH_GOLD" };
+    return { ok: false, reason: "NOT_ENOUGH_GOLD", log: "Không đủ vàng!" };
 
   if (service.id === "srv_heal") {
     return {
@@ -114,5 +114,5 @@ export const buyService = ({
     };
   }
 
-  return { ok: false, reason: "UNKNOWN_SERVICE" };
+  return { ok: false, reason: "UNKNOWN_SERVICE", log: "Dịch vụ không hợp lệ!" };
 };

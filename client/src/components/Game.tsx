@@ -1431,6 +1431,34 @@ function Game() {
     addLog("Đã rời cửa hàng.");
   }, [completeRoom, currentRoomId, addLog]);
 
+  const openShopRoom = useCallback(() => {
+    const nextShopItems = generateShop(floor, player.classId);
+    setShopItems(nextShopItems);
+    setActiveModal(MODAL_STATE.SHOP);
+  }, [floor, player.classId]);
+
+  const openTreasureRoom = useCallback(() => {
+    const nextLoot = generateLoot(
+      zone.id,
+      floor,
+      "TREASURE",
+      player.classId,
+      currentRealStats.luck,
+    );
+    setLoot(nextLoot);
+    setGameState(GAME_STATE.VICTORY);
+  }, [zone.id, floor, player.classId, currentRealStats.luck]);
+
+  const openCombatRoom = useCallback(
+    (roomType) => {
+      const nextMonster = generateMonster(floor, roomType, zone);
+      setMonster(nextMonster);
+      setDiceResult(null);
+      setGameState(GAME_STATE.COMBAT);
+    },
+    [floor, zone],
+  );
+
   const enterRoom = useCallback(
     (r) => {
       if (r.locked)
@@ -1440,30 +1468,13 @@ function Game() {
         addLog("Tầng cũ đã được dọn sạch.", "text-slate-400");
         return completeRoom(r.id, r.type);
       }
-      if (r.type === "SHOP") {
-        setShopItems(generateShop(floor, player.classId));
-        return setActiveModal(MODAL_STATE.SHOP);
-      }
-      if (r.type === "TREASURE") {
-        setLoot(
-          generateLoot(
-            zone.id,
-            floor,
-            "TREASURE",
-            player.classId,
-            currentRealStats.luck,
-          ),
-        );
-        setGameState(GAME_STATE.VICTORY);
-        return;
-      }
+      if (r.type === "SHOP") return openShopRoom();
+      if (r.type === "TREASURE") return openTreasureRoom();
       if (["COMBAT", "ELITE", "BOSS"].includes(r.type)) {
-        setMonster(generateMonster(floor, r.type, zone));
-        setDiceResult(null);
-        setGameState(GAME_STATE.COMBAT);
+        openCombatRoom(r.type);
       }
     },
-    [floor, player.classId, zone, currentRealStats.luck, addLog, completeRoom],
+    [openCombatRoom, openShopRoom, openTreasureRoom, addLog, completeRoom],
   );
 
   const handleCombat = useCallback(
@@ -1649,7 +1660,9 @@ function Game() {
     setPlayer(result.player);
     if (loot.item) addLog(`Nhận được: ${loot.item.name}`, "text-green-400");
     if (result.levelsGained > 0) {
-      addEffect("LEVEL UP!", "heal", 50, 45);
+      Array.from({ length: result.levelsGained }).forEach(() => {
+        addEffect("LEVEL UP!", "heal", 50, 45);
+      });
       addLog(`Lên cấp ${result.level}!`, "text-yellow-400 font-bold");
     }
     setLoot(null);
@@ -1826,7 +1839,7 @@ function Game() {
           generateGameItem(baseItem, level, forceRarity),
         rarityConfig: RARITY_CONFIG,
       });
-      if (!result.ok) return addLog("Không đủ vàng!", "text-red-500");
+      if (!result.ok) return addLog(result.log, "text-red-500");
       setPlayer(result.player);
       addLog(result.log, result.item ? "text-yellow-400" : "text-green-400");
     },
