@@ -22,7 +22,7 @@ export interface PlayerEquipment {
 export interface GameEffect {
   id: string;
   name: string;
-  type: 'BUFF' | 'DEBUFF';
+  type: "BUFF" | "DEBUFF";
   icon?: any;
   color: string;
   desc: string;
@@ -40,7 +40,7 @@ export interface GameItem {
   id: string;
   uid: string;
   name: string;
-  type: 'WEAPON' | 'ARMOR' | 'ACCESSORY' | 'CONSUMABLE';
+  type: "WEAPON" | "ARMOR" | "ACCESSORY" | "CONSUMABLE";
   subType?: string;
   baseCost: number;
   cost: number;
@@ -80,7 +80,7 @@ export interface Monster {
   exp: number;
   gold: number;
   diceSides: number;
-  type: 'monster' | 'boss';
+  type: "monster" | "boss";
   seed: number;
   effects: GameEffect[];
   roomType?: string;
@@ -119,7 +119,7 @@ export interface DiceResult {
 export interface FloatingEffect {
   id: string;
   text: string;
-  type: 'heal' | 'damage';
+  type: "heal" | "damage";
   x: number;
   y: number;
 }
@@ -128,3 +128,25 @@ export interface AnimState {
   p: string;
   m: string;
 }
+
+export type GameClassDefinition =
+  (typeof import("./game/constants/classes").CLASSES_DB)[keyof typeof import("./game/constants/classes").CLASSES_DB];
+export type GameZoneDefinition =
+  (typeof import("./game/constants/zones").ZONES_DB)[number];
+export type GameEffectDefinition =
+  (typeof import("./game/constants/effects").EFFECTS_DB)[keyof typeof import("./game/constants/effects").EFFECTS_DB];
+export type RoomTypeDefinition =
+  (typeof import("./game/constants/rooms").ROOM_TYPES)[keyof typeof import("./game/constants/rooms").ROOM_TYPES];
+export type MoveDefinition =
+  (typeof import("./game/constants/moves").MOVES)[keyof typeof import("./game/constants/moves").MOVES];
+export type RarityDefinition =
+  (typeof import("./game/constants/rarity").RARITY_CONFIG)[keyof typeof import("./game/constants/rarity").RARITY_CONFIG];
+export type ItemAffixDefinition =
+  (typeof import("./game/constants/items").AFFIX_DB)[number];
+export type ConsumableAction =
+  | "HEAL"
+  | "RESET_POINTS"
+  | "APPLY_STRONG_ATK"
+  | "APPLY_SHIELD";
+export type ItemTemplate =
+  (typeof import("./game/constants/items").ITEMS_DB)[number];
