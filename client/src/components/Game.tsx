@@ -6,6 +6,7 @@ import {
   Store, Hammer, Zap, Shirt, Sparkles, Gift, Lock, Minus, Plus, ChevronRight, ChevronLeft, Droplets, Star, Scroll, Cross, Book, Wand, Package, Syringe, Search, Footprints, Info
 } from 'lucide-react';
 import PixelItemIcon from '@/components/PixelItemIcon';
+import { generateMonster } from '@/lib/game/monsters';
 
 // --- CONFIGURATION ---
 const ITEMS_PER_PAGE = 20;
@@ -429,22 +430,6 @@ const generateShop = (floor, playerClass) => {
   items.push({ id: 'srv_heal', name: 'Hồi Phục', type: 'SERVICE', cost: 10 + floor * 5, icon: Syringe, desc: 'Hồi đầy HP', rarity: 2, uid: `service_heal_${Date.now()}`, baseCost: 10 + floor * 5 });
   items.push({ id: 'srv_box', name: 'Hộp Bí Ẩn', type: 'SERVICE', cost: 50 + floor * 10, icon: Package, desc: 'Nhận vật phẩm ngẫu nhiên hiếm', rarity: 3, uid: `service_box_${Date.now()}`, baseCost: 50 + floor * 10 });
   return items;
-};
-
-const generateMonster = (floor, roomType, zoneData) => {
-  const prefix = MONSTER_PREFIXES[Math.floor(Math.random() * MONSTER_PREFIXES.length)];
-  const type = MONSTER_TYPES[Math.floor(Math.random() * MONSTER_TYPES.length)];
-  const normalizedType = MONSTER_TYPE_MAP[type.toLowerCase()] || 'slime';
-  const isElite = roomType === 'ELITE';
-  const isBoss = roomType === 'BOSS';
-  const roomFactor = isBoss ? 2.5 : isElite ? 1.5 : 1;
-  const baseHp = Math.floor((24 + floor * 12 + zoneData.difficulty * 6) * roomFactor);
-  const baseAtk = Math.floor((5 + floor * 2 + zoneData.difficulty) * roomFactor);
-  let monster = { uid: randomId(), name: `${prefix} ${type}`, hp: baseHp, maxHp: baseHp, atk: baseAtk, diceSides: 6 + Math.min(4, Math.floor(floor / 4)), seed: Math.random() * 1000, type: normalizedType, tier: isBoss ? 'boss' : (isElite ? 'elite' : 'normal'), entityType: isBoss ? 'boss' : 'monster', roomType, effects: [] };
-  if (zoneData.id === 'z_forest' && Math.random() < 0.3) monster = applyStatusEffect(monster, 'POISON', 3);
-  if (zoneData.id === 'z_ruins' && Math.random() < 0.3) monster = applyStatusEffect(monster, 'STUN', 1);
-  if (zoneData.id === 'z_dungeon' && Math.random() < 0.3) monster = applyStatusEffect(monster, 'VULNERABLE', 3);
-  return monster;
 };
 
 const generateMap = (floor, zoneId, isCleared = false) => {
@@ -1436,8 +1421,32 @@ function Game() {
                     </div>
                   </div>
                 </div>
-                <div className="text-sm text-slate-300 mb-4">
-                  Loại phòng: {ROOM_TYPES[monster.roomType]?.label || 'COMBAT'}
+                <div className="space-y-3 text-left text-sm text-slate-300 mb-4">
+                  <div>Loại phòng: {ROOM_TYPES[monster.roomType]?.label || 'COMBAT'}</div>
+                  <div>Khu vực: <span className="font-semibold text-white">{monster.zoneName || zone.name}</span></div>
+                  <div>Độ khó: <span className="font-semibold text-white">{monster.metadata?.difficultyLabel || 'Ổn định'}</span></div>
+                  <div>Phân loại: <span className="font-semibold text-white">{monster.metadata?.archetype || 'Quái thường'}</span></div>
+                  <div className="rounded border border-slate-700 bg-slate-900 p-3 text-xs text-slate-300">
+                    <div className="font-semibold text-slate-100 mb-1">Mô tả</div>
+                    <div>{monster.metadata?.roomNote}</div>
+                    <div className="mt-2">{monster.metadata?.zoneEffectHint}</div>
+                  </div>
+                  <div className="rounded border border-slate-700 bg-slate-900 p-3 text-xs text-slate-300">
+                    <div className="font-semibold text-slate-100 mb-1">Scaling</div>
+                    <div>Tầng {monster.metadata?.scaling?.floor} • HP x{monster.metadata?.scaling?.hpMultiplier} • ATK x{monster.metadata?.scaling?.atkMultiplier}</div>
+                  </div>
+                  <div>
+                    <div className="mb-1 text-xs uppercase tracking-wide text-slate-400">Hiệu ứng tiềm năng</div>
+                    <div className="flex flex-wrap gap-2">
+                      {monster.metadata?.effects?.length ? monster.metadata.effects.map((effect) => (
+                        <span key={effect.id} className={`rounded border border-slate-700 bg-slate-900 px-2 py-1 text-[10px] ${effect.color}`}>
+                          {effect.name} ({effect.duration})
+                        </span>
+                      )) : (
+                        <span className="text-xs text-slate-500">Chưa có hiệu ứng gắn sẵn.</span>
+                      )}
+                    </div>
+                  </div>
                 </div>
                 <button 
                   onClick={() => setActiveModal(MODAL_STATE.NONE)}
