@@ -7,6 +7,7 @@ import {
 } from 'lucide-react';
 import PixelItemIcon from '@/components/PixelItemIcon';
 import { applyStatusEffect, calculateIncomingDamage, mitigateIncomingDamage, runTickEffects as runTickEffectsPure } from '@/lib/game/effects';
+import { generateMonster } from '@/lib/game/monsters';
 
 // --- CONFIGURATION ---
 const ITEMS_PER_PAGE = 20;
@@ -147,22 +148,6 @@ const ITEMS_DB = [
   
   { id: 'ac_ring', name: 'Nhẫn Lực', type: 'ACCESSORY', baseCost: 100, rarity: 2, baseStats: { atk: 2, luck: 1 }, icon: Star },
 ];
-
-const MONSTER_PREFIXES = ["Hư Không", "Bóng Tối", "Rực Lửa", "Băng Giá", "Độc Dược", "Cuồng Nộ", "Cổ Đại"];
-const MONSTER_TYPES = ["Slime", "Goblin", "Bộ Xương", "Dơi", "Sói", "Orc", "Phù Thủy", "Golem", "Rồng"];
-const SPRITE_MODE = 'sheet';
-const CLASS_SPRITE_IDS = ['warrior', 'rogue', 'mage', 'cleric'];
-const MONSTER_TYPE_MAP = {
-  slime: 'slime',
-  goblin: 'goblin',
-  'bộ xương': 'skeleton',
-  dơi: 'bat',
-  sói: 'wolf',
-  orc: 'orc',
-  'phù thủy': 'witch',
-  golem: 'golem',
-  rồng: 'dragon',
-};
 
 // --- LOGIC FUNCTIONS ---
 const randomId = () => Math.random().toString(36).substring(2, 11);
@@ -353,22 +338,6 @@ const generateShop = (floor, playerClass) => {
   items.push({ id: 'srv_heal', name: 'Hồi Phục', type: 'SERVICE', cost: 10 + floor * 5, icon: Syringe, desc: 'Hồi đầy HP', rarity: 2, uid: `service_heal_${Date.now()}`, baseCost: 10 + floor * 5 });
   items.push({ id: 'srv_box', name: 'Hộp Bí Ẩn', type: 'SERVICE', cost: 50 + floor * 10, icon: Package, desc: 'Nhận vật phẩm ngẫu nhiên hiếm', rarity: 3, uid: `service_box_${Date.now()}`, baseCost: 50 + floor * 10 });
   return items;
-};
-
-const generateMonster = (floor, roomType, zoneData) => {
-  const prefix = MONSTER_PREFIXES[Math.floor(Math.random() * MONSTER_PREFIXES.length)];
-  const type = MONSTER_TYPES[Math.floor(Math.random() * MONSTER_TYPES.length)];
-  const normalizedType = MONSTER_TYPE_MAP[type.toLowerCase()] || 'slime';
-  const isElite = roomType === 'ELITE';
-  const isBoss = roomType === 'BOSS';
-  const roomFactor = isBoss ? 2.5 : isElite ? 1.5 : 1;
-  const baseHp = Math.floor((24 + floor * 12 + zoneData.difficulty * 6) * roomFactor);
-  const baseAtk = Math.floor((5 + floor * 2 + zoneData.difficulty) * roomFactor);
-  let monster = { uid: randomId(), name: `${prefix} ${type}`, hp: baseHp, maxHp: baseHp, atk: baseAtk, diceSides: 6 + Math.min(4, Math.floor(floor / 4)), seed: Math.random() * 1000, type: normalizedType, tier: isBoss ? 'boss' : (isElite ? 'elite' : 'normal'), entityType: isBoss ? 'boss' : 'monster', roomType, effects: [] };
-  if (zoneData.id === 'z_forest' && Math.random() < 0.3) monster = applyStatusEffect(monster, 'POISON', 3);
-  if (zoneData.id === 'z_ruins' && Math.random() < 0.3) monster = applyStatusEffect(monster, 'STUN', 1);
-  if (zoneData.id === 'z_dungeon' && Math.random() < 0.3) monster = applyStatusEffect(monster, 'VULNERABLE', 3);
-  return monster;
 };
 
 const generateMap = (floor, zoneId, isCleared = false) => {
