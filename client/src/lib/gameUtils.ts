@@ -6,6 +6,29 @@
 import { EFFECTS_DB, AFFIX_DB, ITEMS_DB, RARITY_CONFIG } from './gameConstants';
 import { Player, GameEffect, GameItem, Monster } from './gameTypes';
 
+type ConsumableLike = Partial<GameItem> & {
+  id?: string;
+  desc?: string;
+  baseVal?: number;
+  descFormat?: (value: number) => string;
+};
+
+export const getConsumableValue = (item: ConsumableLike, playerClass?: string): number => {
+  const levelFactor = 1 + 0.1 * ((item.level || 1) - 1);
+  const baseVal = item.baseVal || 0;
+  const healBoost = playerClass === 'cleric' && item.id?.startsWith('pot_') ? 1.5 : 1;
+
+  return Math.floor(baseVal * levelFactor * healBoost);
+};
+
+export const getConsumableDescription = (item: ConsumableLike, playerClass?: string): string => {
+  if (typeof item.descFormat !== 'function') {
+    return item.desc || '';
+  }
+
+  return item.descFormat(getConsumableValue(item, playerClass));
+};
+
 export const resetPoints = (player: Player): Player => {
   const totalStats = Object.values(player.statsAllocated).reduce((a, b) => a + b, 0);
   const totalSkills = Object.values(player.skills).reduce((a, b) => a + b, 0);
