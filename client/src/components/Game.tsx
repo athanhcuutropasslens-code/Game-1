@@ -6,6 +6,7 @@ import {
   Store, Hammer, Zap, Shirt, Sparkles, Gift, Lock, Minus, Plus, ChevronRight, ChevronLeft, Droplets, Star, Scroll, Cross, Book, Wand, Package, Syringe, Search, Map as MapIcon, Footprints, Info
 } from 'lucide-react';
 import PixelItemIcon from '@/components/PixelItemIcon';
+import { getConsumableDescription, getConsumableValue } from '@/lib/game/items';
 
 // --- CONFIGURATION ---
 const ITEMS_PER_PAGE = 20;
@@ -237,13 +238,6 @@ const applyStatusEffect = (entity, effectKey, duration, overrideVal = null) => {
   }
 
   return { ...entity, effects: nextEffects };
-};
-
-const getConsumableValue = (item, playerClass) => {
-  const levelFactor = 1 + 0.1 * ((item.level || 1) - 1);
-  const baseVal = item.baseVal || 0;
-  const healBoost = playerClass === 'cleric' && item.id.startsWith('pot_') ? 1.5 : 1;
-  return Math.floor(baseVal * levelFactor * healBoost);
 };
 
 const calculateCost = (item) => {
@@ -896,7 +890,7 @@ function Game() {
 
   const upgradeSkill = useCallback((skillId) => { const currentLevel = player.skills[skillId] || 0; const skill = CLASSES_DB[player.classId]?.skills.find((s) => s.id === skillId); if (!skill || currentLevel >= skill.max || player.skillPoints <= 0) return; setPlayer((p) => ({ ...p, skillPoints: p.skillPoints - 1, skills: { ...p.skills, [skillId]: currentLevel + 1 } })); addLog(`Đã học: ${skill.name} cấp ${currentLevel + 1}`, 'text-blue-400'); }, [player, addLog]);
 
-  const useConsumable = useCallback((item) => { if (!item.effect) return; const value = getConsumableValue(item, player.classId); setPlayer((prev) => ({ ...item.effect(prev, { stats: currentRealStats, value }), inventory: prev.inventory.filter((i) => i.uid !== item.uid) })); setSelectionUID(null); addLog(`Đã dùng ${item.name}`, 'text-green-400'); addEffect(item.id.startsWith('pot_') ? `+${value}` : 'BUFF', 'heal', 68, 74); }, [player.classId, currentRealStats, addLog, addEffect]);
+  const useConsumable = useCallback((item) => { if (!item.effect) return; const value = getConsumableValue(item, player.classId); const context = { stats: currentRealStats, value }; setPlayer((prev) => ({ ...item.effect(prev, context), inventory: prev.inventory.filter((i) => i.uid !== item.uid) })); setSelectionUID(null); addLog(`Đã dùng ${item.name}`, 'text-green-400'); addEffect(item.id.startsWith('pot_') ? `+${value}` : 'BUFF', 'heal', 68, 74); }, [player.classId, currentRealStats, addLog, addEffect]);
 
   const equipItem = useCallback((item) => { if (!player.classId) return; if (!isItemUsableByClass(item, player.classId)) return addLog('Lớp này không thể trang bị vật phẩm này!', 'text-red-500'); const slot = item.type === 'WEAPON' ? 'weapon' : item.type === 'ARMOR' ? 'armor' : 'accessory'; const current = player.equipment[slot]; const newInv = player.inventory.filter((i) => i.uid !== item.uid); if (current) newInv.push(current); setPlayer((p) => ({ ...p, inventory: newInv, equipment: { ...p.equipment, [slot]: item } })); setSelectionUID(item.uid); addLog(`Đã trang bị ${item.name}`, 'text-blue-400'); }, [player, addLog]);
 
@@ -1552,7 +1546,9 @@ function Game() {
                   )}
                   
                   <div className="text-xs text-yellow-500 mb-3">
-                    {selectedItem.type === 'CONSUMABLE' ? (selectedItem.descFormat ? selectedItem.descFormat(getConsumableValue(selectedItem, player.classId)) : selectedItem.desc) : (selectedItem.desc || 'Trang bị hiếm dùng để gia tăng sức mạnh.')}
+                    {selectedItem.type === 'CONSUMABLE'
+                      ? getConsumableDescription(selectedItem, player.classId)
+                      : (selectedItem.desc || 'Trang bị hiếm dùng để gia tăng sức mạnh.')}
                   </div>
                   {selectedItem.affixes?.length > 0 && (
                     <div className="mb-3 flex flex-wrap gap-1">
@@ -1644,7 +1640,9 @@ function Game() {
                         {item.name} {item.level ? `+${item.level}` : ''}
                       </div>
                       <div className="text-[10px] text-slate-400">
-                        {item.desc || (item.baseCost + ' G')}
+                        {item.type === 'CONSUMABLE'
+                          ? getConsumableDescription(item, player.classId)
+                          : (item.desc || (item.baseCost + ' G'))}
                       </div>
                     </div>
                     <button 

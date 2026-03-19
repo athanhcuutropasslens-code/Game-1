@@ -49,10 +49,12 @@ export interface GameItem {
   level: number;
   desc: string;
   icon: string;
+  baseVal?: number;
+  descFormat?: (value: number) => string;
   baseStats?: Partial<PlayerStats>;
   stats?: Partial<PlayerStats>;
   affixes?: any[];
-  effect?: (player: Player, ctx: any) => Player;
+  effect?: (player: Player, context: { stats: PlayerStats; value: number }) => Player;
 }
 
 export interface Player {
