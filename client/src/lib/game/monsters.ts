@@ -1,5 +1,5 @@
-const MONSTER_PREFIXES = ['Hư Không', 'Bóng Tối', 'Rực Lửa', 'Băng Giá', 'Độc Dược', 'Cuồng Nộ', 'Cổ Đại'];
-const MONSTER_TYPES = ['Slime', 'Goblin', 'Bộ Xương', 'Dơi', 'Sói', 'Orc', 'Phù Thủy', 'Golem', 'Rồng'];
+import { MONSTER_PREFIXES, MONSTER_TYPES } from '@/lib/gameConstants';
+
 const MONSTER_TYPE_MAP: Record<string, string> = {
   slime: 'slime',
   goblin: 'goblin',

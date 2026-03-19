@@ -6,8 +6,6 @@ import {
   Store, Hammer, Zap, Shirt, Sparkles, Gift, Lock, Minus, Plus, ChevronRight, ChevronLeft, Droplets, Star, Scroll, Cross, Book, Wand, Package, Syringe, Search, Map as MapIcon, Footprints, Info
 } from 'lucide-react';
 import PixelItemIcon from '@/components/PixelItemIcon';
-import { MOVES, resolveEffectTick, resolveRpsRound } from '@/lib/game/combat';
-import { generateMonster } from '@/lib/game/monsters';
 
 // --- CONFIGURATION ---
 const ITEMS_PER_PAGE = 20;
@@ -412,6 +410,9 @@ const generateMap = (floor, zoneId, isCleared = false) => {
   rooms.push({ id: numRooms - 1, type: 'BOSS', completed: isCleared, locked: !isCleared });
   return rooms;
 };
+
+import { MOVES, resolveEffectTick, resolveRpsRound } from '@/lib/game/combat';
+import { generateMonster } from '@/lib/game/monsters';
 
 // --- COMPONENTS ---
 const PixelAvatar = ({ seed, size = 100, type = 'hero', isDead = false }) => {
