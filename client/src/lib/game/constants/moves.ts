@@ -1,4 +1,6 @@
-export const MOVES = {
+import type { MoveDefinition } from "@/lib/gameTypes";
+
+export const MOVES: Record<"ROCK" | "PAPER" | "SCISSORS", MoveDefinition> = {
   ROCK: {
     id: "rock",
     name: "Búa",

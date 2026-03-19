@@ -1,4 +1,6 @@
-export const ZONES_DB = [
+import type { GameZoneDefinition } from "@/lib/gameTypes";
+
+export const ZONES_DB: GameZoneDefinition[] = [
   {
     id: "z_forest",
     name: "Rừng Độc",

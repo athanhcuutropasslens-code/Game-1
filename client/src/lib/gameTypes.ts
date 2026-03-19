@@ -2,6 +2,28 @@
  * Game Type Definitions
  */
 
+import type { LucideIcon } from "lucide-react";
+import type { ComponentType } from "react";
+
+export type GameIcon =
+  | LucideIcon
+  | ComponentType<{ size?: number; className?: string }>
+  | string;
+export type EquipmentType = "WEAPON" | "ARMOR" | "ACCESSORY" | "CONSUMABLE";
+export type EffectType = "BUFF" | "DEBUFF";
+export type RoomKey =
+  | "START"
+  | "COMBAT"
+  | "ELITE"
+  | "TREASURE"
+  | "SHOP"
+  | "BOSS";
+export type ConsumableAction =
+  | "HEAL"
+  | "RESET_POINTS"
+  | "APPLY_STRONG_ATK"
+  | "APPLY_SHIELD";
+
 export interface PlayerStats {
   atk: number;
   def: number;
@@ -13,17 +35,19 @@ export interface PlayerStats {
   hpRegen: number;
 }
 
-export interface PlayerEquipment {
-  weapon: GameItem | null;
-  armor: GameItem | null;
-  accessory: GameItem | null;
+export interface ItemAffixDefinition {
+  id: string;
+  name: string;
+  stat: keyof PlayerStats;
+  val: number;
+  type: Array<Exclude<EquipmentType, "CONSUMABLE">>;
 }
 
 export interface GameEffect {
   id: string;
   name: string;
-  type: "BUFF" | "DEBUFF";
-  icon?: any;
+  type: EffectType;
+  icon?: GameIcon;
   color: string;
   desc: string;
   duration: number;
@@ -36,11 +60,14 @@ export interface GameEffect {
   incomingPercent?: number;
 }
 
+export interface GameEffectDefinition
+  extends Omit<GameEffect, "duration" | "uid"> {}
+
 export interface GameItem {
   id: string;
   uid: string;
   name: string;
-  type: "WEAPON" | "ARMOR" | "ACCESSORY" | "CONSUMABLE";
+  type: EquipmentType;
   subType?: string;
   baseCost: number;
   cost: number;
@@ -48,11 +75,25 @@ export interface GameItem {
   rarity: number;
   level: number;
   desc: string;
-  icon: string;
+  icon: GameIcon;
+  baseVal?: number;
   baseStats?: Partial<PlayerStats>;
   stats?: Partial<PlayerStats>;
-  affixes?: any[];
-  effect?: (player: Player, ctx: any) => Player;
+  affixes?: ItemAffixDefinition[];
+  useAction?: ConsumableAction;
+  descFormat?: (value: number) => string;
+}
+
+export interface ItemTemplate
+  extends Omit<
+    GameItem,
+    "uid" | "cost" | "sellPrice" | "level" | "desc" | "stats" | "affixes"
+  > {}
+
+export interface PlayerEquipment {
+  weapon: GameItem | null;
+  armor: GameItem | null;
+  accessory: GameItem | null;
 }
 
 export interface Player {
@@ -86,6 +127,30 @@ export interface Monster {
   roomType?: string;
 }
 
+export interface SkillDefinition {
+  id: string;
+  name: string;
+  max: number;
+  desc: string;
+  type: "PASSIVE";
+  mod?: Partial<PlayerStats>;
+}
+
+export interface GameClassDefinition {
+  id: string;
+  name: string;
+  icon: GameIcon;
+  color: string;
+  desc: string;
+  baseMod: Partial<PlayerStats>;
+  allowed: {
+    weapon: string[];
+    armor: string[];
+  };
+  passiveDesc: string;
+  skills: SkillDefinition[];
+}
+
 export interface MapRoom {
   id: number;
   type: string;
@@ -97,6 +162,37 @@ export interface Loot {
   exp: number;
   gold: number;
   item?: GameItem;
+}
+
+export interface GameZoneDefinition {
+  id: string;
+  name: string;
+  difficulty: number;
+  desc: string;
+  color: string;
+  bg: string;
+}
+
+export interface RoomTypeDefinition {
+  icon: GameIcon;
+  color: string;
+  label: string;
+}
+
+export interface MoveDefinition {
+  id: string;
+  name: string;
+  icon: string;
+  beats: "rock" | "paper" | "scissors";
+  color: string;
+}
+
+export interface RarityDefinition {
+  name: string;
+  color: string;
+  bg: string;
+  affixes: number;
+  weight: number;
 }
 
 export interface Zone {
@@ -128,25 +224,3 @@ export interface AnimState {
   p: string;
   m: string;
 }
-
-export type GameClassDefinition =
-  (typeof import("./game/constants/classes").CLASSES_DB)[keyof typeof import("./game/constants/classes").CLASSES_DB];
-export type GameZoneDefinition =
-  (typeof import("./game/constants/zones").ZONES_DB)[number];
-export type GameEffectDefinition =
-  (typeof import("./game/constants/effects").EFFECTS_DB)[keyof typeof import("./game/constants/effects").EFFECTS_DB];
-export type RoomTypeDefinition =
-  (typeof import("./game/constants/rooms").ROOM_TYPES)[keyof typeof import("./game/constants/rooms").ROOM_TYPES];
-export type MoveDefinition =
-  (typeof import("./game/constants/moves").MOVES)[keyof typeof import("./game/constants/moves").MOVES];
-export type RarityDefinition =
-  (typeof import("./game/constants/rarity").RARITY_CONFIG)[keyof typeof import("./game/constants/rarity").RARITY_CONFIG];
-export type ItemAffixDefinition =
-  (typeof import("./game/constants/items").AFFIX_DB)[number];
-export type ConsumableAction =
-  | "HEAL"
-  | "RESET_POINTS"
-  | "APPLY_STRONG_ATK"
-  | "APPLY_SHIELD";
-export type ItemTemplate =
-  (typeof import("./game/constants/items").ITEMS_DB)[number];

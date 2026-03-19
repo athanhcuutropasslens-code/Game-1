@@ -1,6 +1,8 @@
 import { ArrowRight, Gift, Skull, Store, Sword, Zap } from "lucide-react";
 
-export const ROOM_TYPES = {
+import type { RoomKey, RoomTypeDefinition } from "@/lib/gameTypes";
+
+export const ROOM_TYPES: Record<RoomKey, RoomTypeDefinition> = {
   START: { icon: ArrowRight, color: "text-white", label: "Lối Vào" },
   COMBAT: { icon: Sword, color: "text-slate-300", label: "Quái Vật" },
   ELITE: { icon: Skull, color: "text-red-400", label: "Tinh Anh" },

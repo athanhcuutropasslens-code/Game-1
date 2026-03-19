@@ -1,4 +1,6 @@
-export const RARITY_CONFIG = {
+import type { RarityDefinition } from "@/lib/gameTypes";
+
+export const RARITY_CONFIG: Record<number, RarityDefinition> = {
   1: {
     name: "Thường",
     color: "border-slate-500 text-slate-300",

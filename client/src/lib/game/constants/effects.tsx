@@ -1,6 +1,13 @@
+import { Droplets, Heart, Shield, Sword } from "lucide-react";
+
+import type { GameEffectDefinition, GameIcon } from "@/lib/gameTypes";
+
 type InlineIconProps = { size?: number; className?: string };
 
-import { Droplets, Heart, Shield, Sword } from "lucide-react";
+type EffectMap = Record<
+  "STRONG_ATK" | "REGEN" | "POISON" | "SHIELD" | "STUN" | "VULNERABLE",
+  GameEffectDefinition
+>;
 
 const StarsIcon = ({ size, className }: InlineIconProps) => (
   <svg
@@ -41,7 +48,12 @@ const BrokenShieldIcon = ({ size, className }: InlineIconProps) => (
   </svg>
 );
 
-export const EFFECTS_DB = {
+export const EFFECT_ICONS: Record<"STARS" | "BROKEN_SHIELD", GameIcon> = {
+  STARS: StarsIcon,
+  BROKEN_SHIELD: BrokenShieldIcon,
+};
+
+export const EFFECTS_DB: EffectMap = {
   STRONG_ATK: {
     id: "eff_strong",
     name: "Tăng Lực",
@@ -82,7 +94,7 @@ export const EFFECTS_DB = {
     id: "eff_stun",
     name: "Choáng",
     type: "DEBUFF",
-    icon: StarsIcon,
+    icon: EFFECT_ICONS.STARS,
     color: "text-yellow-400",
     desc: "Mất lượt",
     isStun: true,
@@ -91,7 +103,7 @@ export const EFFECTS_DB = {
     id: "eff_vuln",
     name: "Suy Yếu",
     type: "DEBUFF",
-    icon: BrokenShieldIcon,
+    icon: EFFECT_ICONS.BROKEN_SHIELD,
     color: "text-purple-400",
     desc: "+20% ST nhận vào",
     incomingPercent: 20,

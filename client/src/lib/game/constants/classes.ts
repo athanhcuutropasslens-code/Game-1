@@ -1,6 +1,11 @@
 import { Cross, Skull, Sword, Wand } from "lucide-react";
 
-export const CLASSES_DB = {
+import type { GameClassDefinition } from "@/lib/gameTypes";
+
+export const CLASSES_DB: Record<
+  "warrior" | "rogue" | "mage" | "cleric",
+  GameClassDefinition
+> = {
   warrior: {
     id: "warrior",
     name: "Chiến Binh",

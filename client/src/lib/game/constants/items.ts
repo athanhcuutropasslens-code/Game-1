@@ -10,7 +10,9 @@ import {
   Wand,
 } from "lucide-react";
 
-export const AFFIX_DB = [
+import type { ItemAffixDefinition, ItemTemplate } from "@/lib/gameTypes";
+
+export const AFFIX_DB: ItemAffixDefinition[] = [
   { id: "sharp", name: "Sắc Bén", stat: "atk", val: 1, type: ["WEAPON"] },
   { id: "heavy", name: "Nặng Ký", stat: "atk", val: 2, type: ["WEAPON"] },
   {
@@ -37,7 +39,7 @@ export const AFFIX_DB = [
   },
 ];
 
-export const ITEMS_DB = [
+export const ITEMS_DB: ItemTemplate[] = [
   {
     id: "pot_small",
     name: "Bình Máu Nhỏ",
@@ -67,7 +69,7 @@ export const ITEMS_DB = [
     baseCost: 500,
     rarity: 4,
     baseVal: 0,
-    descFormat: () => "Hoàn trả toàn bộ điểm chỉ số và kỹ năng",
+    descFormat: (_val: number) => "Hoàn trả toàn bộ điểm chỉ số và kỹ năng",
     useAction: "RESET_POINTS",
     icon: Book,
   },
@@ -100,8 +102,8 @@ export const ITEMS_DB = [
     subType: "SWORD",
     baseCost: 50,
     rarity: 1,
-    baseStats: { atk: 4 },
     icon: Sword,
+    baseStats: { atk: 4 },
   },
   {
     id: "w_axe",
@@ -110,8 +112,8 @@ export const ITEMS_DB = [
     subType: "AXE",
     baseCost: 60,
     rarity: 2,
-    baseStats: { atk: 6 },
     icon: Hammer,
+    baseStats: { atk: 6 },
   },
   {
     id: "w_dagger",
@@ -120,8 +122,8 @@ export const ITEMS_DB = [
     subType: "DAGGER",
     baseCost: 40,
     rarity: 1,
-    baseStats: { atk: 3, crit: 5 },
     icon: Sword,
+    baseStats: { atk: 3, crit: 5 },
   },
   {
     id: "w_staff",
@@ -130,8 +132,8 @@ export const ITEMS_DB = [
     subType: "STAFF",
     baseCost: 55,
     rarity: 2,
-    baseStats: { atk: 5 },
     icon: Wand,
+    baseStats: { atk: 5 },
   },
   {
     id: "a_plate",
@@ -140,8 +142,8 @@ export const ITEMS_DB = [
     subType: "PLATE",
     baseCost: 80,
     rarity: 2,
-    baseStats: { def: 4, maxHp: 20 },
     icon: Shield,
+    baseStats: { def: 4, maxHp: 20 },
   },
   {
     id: "a_robe",
@@ -150,8 +152,8 @@ export const ITEMS_DB = [
     subType: "ROBE",
     baseCost: 30,
     rarity: 1,
-    baseStats: { def: 1, maxHp: 10 },
     icon: Shirt,
+    baseStats: { def: 1, maxHp: 10 },
   },
   {
     id: "a_leather",
@@ -160,8 +162,8 @@ export const ITEMS_DB = [
     subType: "LEATHER",
     baseCost: 40,
     rarity: 1,
-    baseStats: { def: 2, maxHp: 15 },
     icon: Shirt,
+    baseStats: { def: 2, maxHp: 15 },
   },
   {
     id: "ac_ring",
@@ -169,7 +171,7 @@ export const ITEMS_DB = [
     type: "ACCESSORY",
     baseCost: 100,
     rarity: 2,
-    baseStats: { atk: 2, luck: 1 },
     icon: Star,
+    baseStats: { atk: 2, luck: 1 },
   },
 ];
