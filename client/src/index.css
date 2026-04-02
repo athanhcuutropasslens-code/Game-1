@@ -144,18 +144,19 @@
         transparent 1px,
         transparent 2px
       );
-    animation: flicker 0.15s infinite;
+    /* Removed flicker animation to prevent background strobing */
   }
 
+  /* Flicker animation removed - was causing background flickering during scene transitions */
   @keyframes flicker {
     0% {
-      opacity: 0.97;
+      opacity: 1;
     }
     50% {
       opacity: 1;
     }
     100% {
-      opacity: 0.97;
+      opacity: 1;
     }
   }
 
